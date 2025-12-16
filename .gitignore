@@ -1,0 +1,135 @@
+# -----------------------------------------------------------------------------
+# General Operating System and IDE files
+# -----------------------------------------------------------------------------
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+desktop.ini
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Visual Studio Code (VSCode)
+.vscode/
+
+# IntelliJ / JetBrains IDEs
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Emacs
+*~
+\#*
+.\#*
+
+# Vim
+*.swp
+*.bak
+*.swo
+
+# -----------------------------------------------------------------------------
+# Common Build & Dependency Artifacts
+# -----------------------------------------------------------------------------
+
+# Compiled source files (e.g., C/C++, Java)
+*.o
+*.obj
+*.class
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Temporary/Build directories
+/bin/
+/obj/
+/dist/
+/build/
+/tmp/
+
+# -----------------------------------------------------------------------------
+# Language-Specific Ignore Rules
+# -----------------------------------------------------------------------------
+
+# Python
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+# Virtual Environment
+venv/
+env/
+.venv/
+.virtual_environments/
+pip-log.txt
+.tox/
+
+# Node.js
+/node_modules
+npm-debug.log*
+yarn-error.log
+/out/
+/coverage/
+
+# Ruby
+.bundle/
+/vendor/bundle
+log/*
+tmp/
+
+# Java / Maven / Gradle
+/target/
+/build/
+.gradle/
+*.jar
+*.war
+*.ear
+/out/
+
+# Go
+/bin/
+/pkg/
+
+# PHP / Composer
+/vendor/
+composer.lock
+
+# -----------------------------------------------------------------------------
+# Logs, Credentials, and Configuration
+# -----------------------------------------------------------------------------
+
+# Log files
+*.log
+npm-debug.log
+
+# Environment variables and secrets
+# IMPORTANT: Never commit sensitive data!
+.env
+.env.*
+config/secrets.yml
+
+# Test results
+/coverage/
+
+# Databases
+*.sqlite
+*.db
+
+# -----------------------------------------------------------------------------
+# Custom Files (add your own here)
+# -----------------------------------------------------------------------------
+
+# Add any specific files or directories unique to your project here:
+# /my_uploads/
+# my_private_key.pem
+
+backend/node_modules
+backend/public/*

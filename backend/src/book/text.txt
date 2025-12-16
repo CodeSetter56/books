@@ -1,0 +1,26 @@
+abc 26 [Object: null prototype] {
+  coverimg: [
+    {
+      fieldname: 'coverimg',
+      originalname: '1st pic.png',
+      encoding: '7bit',
+      mimetype: 'image/png',
+      destination: 'D:\\coding\\projects\\books\\public\\data\\uploads',
+      filename: 'f1508a2a9b1340926672ee6632d935b6',
+      path: 'D:\\coding\\projects\\books\\public\\data\\uploads\\f1508a2a9b1340926672ee6632d935b6',
+      size: 1230746
+    }
+  ],
+  file: [
+    {
+      fieldname: 'file',
+      originalname: 'Cv (1).pdf',
+      encoding: '7bit',
+      mimetype: 'application/pdf',
+      destination: 'D:\\coding\\projects\\books\\public\\data\\uploads',
+      filename: '1be3aaa7123fa2e4658d20671607a341',
+      path: 'D:\\coding\\projects\\books\\public\\data\\uploads\\1be3aaa7123fa2e4658d20671607a341',
+      size: 159708
+    }
+  ]
+} 6937dc976d8848a08c724c87
