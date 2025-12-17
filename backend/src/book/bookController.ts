@@ -5,7 +5,7 @@ import createHttpError from "http-errors";
 import { Book } from "./bookModel";
 import { deleteCloudinaryAssets, uploadFileToCloudinary } from "./bookHelper";
 
-const createBook = async (
+export const createBook = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction
@@ -13,6 +13,7 @@ const createBook = async (
   const { title, genre } = req.body;
   const files = req.files as UploadedFiles;
   const userId = req.userId;
+
 
   const coverimgFile = files.coverimg?.[0];
   const bookFile = files.file?.[0];
@@ -35,168 +36,99 @@ const createBook = async (
       file: bookFileUrl,
     });
 
-    res.status(201).json({
-      message: "Book created successfully",
-      newBook,
-    });
+    res.status(201).json({ message: "Book created successfully", newBook });
+
   } catch (error) {
-    if (createHttpError.isHttpError(error)) {
-      return next(error);
-    }
-    return next(
+    next(
       createHttpError(500, `Book creation failed: ${(error as Error).message}`)
     );
   }
 };
 
-const updateBook = async (
+export const updateBook = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
   const { title, genre } = req.body;
   const files = req.files as UploadedFiles;
-  const bookId = req.params.bookId;
+  const { bookId } = req.params;
   const userId = req.userId;
 
   try {
-    const bookToUpdate = await Book.findById(bookId);
-    if (!bookToUpdate) {
-      return next(createHttpError(404, "Book not found"));
-    }
+    const book = await Book.findById(bookId);
+    if (!book) return next(createHttpError(404, "Book not found"));
 
-    if (bookToUpdate.author.toString() !== userId) {
-      return next(
-        createHttpError(403, "You are not authorized to update this book")
-      );
-    }
-
-    const coverimgFile = files.coverimg?.[0];
-    const bookFile = files.file?.[0];
+    if (book.author.toString() !== userId) return next(createHttpError(403, "Forbidden: You do not own this book"));
 
     const updateData: Partial<IBook> = {};
 
     if (title) updateData.title = title;
     if (genre) updateData.genre = genre;
 
-    const oldCoverUrl = bookToUpdate.coverimg;
-    const oldFileUrl = bookToUpdate.file;
-    let shouldDeleteOldAssets = false;
-
-    const uploadPromises: Promise<any>[] = [];
-
-    if (coverimgFile) {
-      shouldDeleteOldAssets = true;
-      const coverUploadPromise = uploadFileToCloudinary(
-        coverimgFile,
+    if (files.coverimg?.[0]) {
+      updateData.coverimg = await uploadFileToCloudinary(
+        files.coverimg[0],
         "book_covers",
         "image"
-      ).then((url) => {
-        updateData.coverimg = url;
-      });
-      uploadPromises.push(coverUploadPromise);
+      );
     }
-
-    if (bookFile) {
-      shouldDeleteOldAssets = true;
-      const bookUploadPromise = uploadFileToCloudinary(
-        bookFile,
+    if (files.file?.[0]) {
+      updateData.file = await uploadFileToCloudinary(
+        files.file[0],
         "book_files",
         "raw"
-      ).then((url) => {
-        updateData.file = url;
-      });
-      uploadPromises.push(bookUploadPromise);
-    }
-
-    await Promise.all(uploadPromises);
-
-    if (Object.keys(updateData).length === 0) {
-      return next(
-        createHttpError(400, "No fields or files provided for update.")
       );
     }
 
     const updatedBook = await Book.findByIdAndUpdate(bookId, updateData, {
       new: true,
-      runValidators: true,
     });
 
-    if (shouldDeleteOldAssets) {
-      console.log("Cleaning up old Cloudinary assets...");
-      try {
-        await deleteCloudinaryAssets(
-          coverimgFile ? oldCoverUrl : bookToUpdate.coverimg,
-          bookFile ? oldFileUrl : bookToUpdate.file,
-          false 
-        );
-        console.log("Old assets cleanup completed.");
-      } catch (error) {
-        console.error("Old assets cleanup failed (non-critical):", error);
-      }
+    // Cleanup old Cloudinary assets if files were replaced...
+    if (files.coverimg?.[0] || files.file?.[0]) {
+      await deleteCloudinaryAssets(
+        files.coverimg?.[0] ? book.coverimg : "",
+        files.file?.[0] ? book.file : "",
+        false
+      );
     }
 
-    res.status(200).json({
-      message: "Book updated successfully",
-      updatedBook,
-    });
+    res.status(200).json({ message: "Book updated successfully", updatedBook });
+
   } catch (error) {
-    return next(
-      createHttpError(500, `Update failed: ${(error as Error).message}`)
-    );
+    next(createHttpError(500, "Failed to update book"));
   }
 };
 
-const deleteBook = async (
+export const deleteBook = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
-  const bookId = req.params.bookId;
+  const { bookId } = req.params;
   const userId = req.userId;
 
   try {
-    const bookToDelete = await Book.findById(bookId);
-    if (!bookToDelete) {
-      return next(createHttpError(404, "Book not found"));
-    }
+    const book = await Book.findById(bookId);
+    if (!book) return next(createHttpError(404, "Book not found"));
 
-    if (bookToDelete.author.toString() !== userId) {
-      return next(
-        createHttpError(403, "You are not authorized to delete this book")
-      );
-    } 
+    if (book.author.toString() !== userId) return next(createHttpError(403, "Forbidden: User does not own this book"));
 
-    await deleteCloudinaryAssets(
-      bookToDelete.coverimg,
-      bookToDelete.file,
-      true
-    );
-    console.log("All Cloudinary assets deleted successfully.");
-
+    await deleteCloudinaryAssets(book.coverimg, book.file, true);
     await Book.findByIdAndDelete(bookId);
-    console.log("Book deleted from database.");
 
-    res.status(200).json({
-      message: "Book deleted successfully",
-    });
+    res.status(204).json({ message: "Book deleted successfully" });
+    
   } catch (error) {
-    console.error("Book Deletion Error:", error);
-    return next(
-      createHttpError(
-        500,
-        `Delete failed: ${
-          (error as Error).message
-        }. Book record preserved in database.`
-      )
-    );
+    next(createHttpError(500, "Deletion failed"));
   }
 };
 
-const getAllBooks = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllBooks = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 3; 
+    const limit = parseInt(req.query.limit as string) || 3;
     const skip = (page - 1) * limit;
 
     const booksQuery = Book.find().skip(skip).limit(limit);
@@ -211,16 +143,19 @@ const getAllBooks = async (req: Request, res: Response, next: NextFunction) => {
       limit: limit,
       totalPages: totalPages,
       totalBooks: totalBooks,
-      books, 
+      books,
     });
   } catch (error) {
     return next(
-      createHttpError(500, `List failed: ${(error as Error).message}`)
+      createHttpError(
+        500,
+        `Failed to get books: ${(error as Error).message}`
+      )
     );
   }
 };
 
-const getBook = async (req: Request, res: Response, next: NextFunction) => {
+export const getBook = async (req: Request, res: Response, next: NextFunction) => {
   const bookId = req.params.bookId;
 
   try {
@@ -234,9 +169,30 @@ const getBook = async (req: Request, res: Response, next: NextFunction) => {
     });
   } catch (error) {
     return next(
-      createHttpError(500, `Get book failed: ${(error as Error).message}`)
+      createHttpError(
+        500,
+        `Failed to get book: ${(error as Error).message}`
+      )
     );
   }
-}
+};
 
-export { createBook, updateBook, deleteBook, getAllBooks, getBook };
+export const getMyBooks = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const userId = req.userId;
+
+  try {
+    const book = await Book.find({ author: userId });
+    if (book.length === 0) {
+      return next(createHttpError(404, "No books found for this user"));
+    }
+    res.status(200).json({
+      message: "User's books retrieved successfully",
+      book,
+    });
+  } catch (error) {
+    return next(
+      createHttpError(500, `Failed to get user's books: ${(error as Error).message}`)
+    );
+  }
+};
+

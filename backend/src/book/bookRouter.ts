@@ -5,6 +5,7 @@ import {
   deleteBook,
   getAllBooks,
   getBook,
+  getMyBooks,
   updateBook,
 } from "./bookController";
 import multer from "multer";
@@ -45,5 +46,6 @@ bookRouter.delete(
 
 bookRouter.get("/", getAllBooks)
 bookRouter.get("/:bookId", getBook)
+bookRouter.get("/my-books", getMyBooks as RequestHandler);
 
 export default bookRouter;

@@ -51,26 +51,24 @@ export const loginUser = async (
   next: NextFunction
 ) => {
   const { email, password } = req.body;
-  console.log(email, password);
-  if (!email || !password) {
-    return next(createHttpError(400, "Email and password are required."));
-  }
+  console.log(`[Auth] Login attempt for email: ${email}`);
 
   try {
-
     const user = (await User.findOne({ email })) as IUser | null;
-    if (!user) return next(createHttpError(400, "Invalid credentials."));
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return next(createHttpError(400, "Invalid credentials."));
-    
+    // Check user and password in one go
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      console.warn(`[Auth] Failed login for ${email}: Invalid credentials`);
+      return next(createHttpError(401, "Invalid email or password"));
+    }
+
     const { accessToken, refreshToken } = generateTokens(user._id);
     setRefreshTokenCookie(res, refreshToken);
 
+    console.log(`[Auth] Success: User ${user._id} logged in`);
     res.status(200).json({ accessToken });
-
   } catch (error) {
-    return next(createHttpError(500, "Login process failed."));
+    next(createHttpError(500, "Internal Server Error during login"));
   }
 };
 
@@ -79,26 +77,29 @@ export const refreshAccessToken = async (
   res: Response,
   next: NextFunction
 ) => {
-  const refreshToken = req.cookies.refreshToken;
+  const token = req.cookies[config.refreshToken.cookieName];
 
-  if (!refreshToken) return next(createHttpError(401, "Session expired, please login again."));
+  if (!token) {
+    console.warn("[Auth] Refresh failed: No cookie present");
+    return next(createHttpError(401, "Session expired. Please login again."));
+  }
 
   try {
-    const decoded = verify(refreshToken, config.jwtSecret as string) as {
+    const decoded = verify(token, config.jwtSecret as string) as {
       sub: string;
     };
-
-    // Generate only a new access token
     const { accessToken } = generateTokens(decoded.sub);
-    res.status(200).json({ accessToken });
 
+    res.status(200).json({ accessToken });
   } catch (err) {
-    res.clearCookie("refreshToken");
-    return next(createHttpError(401, "Invalid session."));
+    console.error("[Auth] Refresh token verification failed, clearing cookie");
+    res.clearCookie(config.refreshToken.cookieName);
+    return next(createHttpError(401, "Invalid session"));
   }
 };
 
 export const logoutUser = (req: Request, res: Response) => {
-  res.clearCookie("refreshToken");
+  res.clearCookie(config.refreshToken.cookieName);
+  console.log("[Auth] User logged out, cookie cleared");
   res.status(200).json({ message: "Logged out successfully" });
 };

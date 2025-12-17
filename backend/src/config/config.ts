@@ -15,6 +15,15 @@ const _config = {
         apiSecret: process.env.CLOUDINARY_API_SECRET!,
     },
     frontendUrl: process.env.FRONTEND_URL,
+
+    refreshToken: {
+        cookieName: "refreshToken",
+        tokenExpiry: {
+            access: "15m" as const,
+            refresh: "7d" as const,
+        },
+        cookieMaxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    }
 }
 
 export const config = Object.freeze(_config);

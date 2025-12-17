@@ -7,6 +7,7 @@ export const uploadFileToCloudinary = async (
   folder: string,
   resourceType: "image" | "raw" = "image"
 ): Promise<string> => {
+
   const mimeType = file.mimetype.split("/")[1] as string;
 
   const uploadOptions: any = {
@@ -15,16 +16,16 @@ export const uploadFileToCloudinary = async (
     format: mimeType,
   };
 
-  if (resourceType === "raw") {
-    uploadOptions.resource_type = "raw";
-  }
+  if (resourceType === "raw") uploadOptions.resource_type = "raw";
 
   try {
     const uploadResult = await cloudinary.uploader.upload(
       file.path,
       uploadOptions
     );
+
     return uploadResult.secure_url;
+ 
   } catch (error) {
     throw error;
   } finally {

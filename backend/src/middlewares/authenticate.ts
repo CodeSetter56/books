@@ -10,8 +10,9 @@ export interface AuthRequest extends Request {
 const authenticate = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.header("Authorization");
 
+  // Early return if header is missing or incorrect format
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    console.log("Auth failed: No token provided");
+    console.warn("[Auth Middleware] Access denied: No Bearer token provided.");
     return next(createHttpError(401, "Authorization token is required."));
   }
 
@@ -24,10 +25,13 @@ const authenticate = (req: Request, res: Response, next: NextFunction) => {
     const _req = req as AuthRequest;
     _req.userId = decoded.sub;
 
-    console.log("Authenticated User ID:", _req.userId);
+    console.log(`[Auth Middleware] User authenticated: ${_req.userId}`);
     next();
   } catch (err) {
-    console.error("Auth Middleware Error:", err);
+    console.error(
+      "[Auth Middleware] Token verification failed:",
+      (err as Error).message
+    );
     return next(createHttpError(401, "Token expired or invalid."));
   }
 };
