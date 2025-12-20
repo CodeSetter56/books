@@ -21,9 +21,4 @@ const backendPath = path.join(__dirname, "backend", ".env");
 const frontendPath = path.join(__dirname, "frontend", ".env");
 
 fs.writeFileSync(backendPath, backendEnvContent);
-console.log(
-  `✅ Backend .env updated (Port: ${config.backendPort}, Allowed Origin: ${config.frontendPort})`
-);
-
 fs.writeFileSync(frontendPath, frontendEnvContent);
-console.log(`✅ Frontend .env updated (API Target: ${config.backendPort})`);

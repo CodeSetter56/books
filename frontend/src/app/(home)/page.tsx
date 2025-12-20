@@ -1,10 +1,9 @@
 import BooksTable from "@/components/BooksTable";
 import { config } from "@/config/config";
+import { Suspense } from "react";
 
 export default async function Home() {
 
-  const res = await fetch(`${config.backendUrl}/books`);
-  const data = await res.json();
 
   return (
     <div className=" w-full p-8">
@@ -14,7 +13,9 @@ export default async function Home() {
           Browse, create, read till your heart's content
         </div>
       </div>
-      <BooksTable books={data.books} />
+      <Suspense fallback={<div>Loading books...</div>}>
+        <BooksTable />
+      </Suspense>
     </div>
   );
 }
