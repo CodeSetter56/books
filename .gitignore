@@ -133,3 +133,5 @@ config/secrets.yml
 
 backend/node_modules
 backend/public/*
+
+project-config.json

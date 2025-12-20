@@ -1,0 +1,14 @@
+{
+  "frontendPort": 3000,
+  "backendPort": 9001,
+  "nodeEnv": "development",
+
+  "dbUrl": "mongo url",
+  "jwtSecret": "secret",
+
+  "cloudinary": {
+    "cloudName": "something",
+    "apiKey": "something",
+    "apiSecret": "something"
+  }
+}
