@@ -4,7 +4,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import PdfViewerWrapper from "./PdfViewerWrapper";
 import { Suspense } from "react";
-import Skeleton from "@/components/Skeleton";
+import Skeleton from "@/components/Skeletons/CardSkeleton";
 
 type Props = {
   params: Promise<{ bookId: string }>;
@@ -71,8 +71,14 @@ async function ViewBook({ params }: Props) {
 
       {/* PDF Grid View */}
       <div>
-        <Suspense fallback={<div><Skeleton /></div>}>
-        <PdfViewerWrapper fileUrl={book.file} />
+        <Suspense
+          fallback={
+            <div>
+              <Skeleton />
+            </div>
+          }
+        >
+          <PdfViewerWrapper fileUrl={book.file} />
         </Suspense>
       </div>
     </div>

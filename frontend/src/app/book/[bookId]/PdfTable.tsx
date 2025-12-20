@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
+import PageSkeleton from "@/components/Skeletons/PageSkeleton";
 
 // Configure worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -10,7 +11,7 @@ export const PdfTable = ({ fileUrl }: { fileUrl: string }) => {
   const [numPages, setNumPages] = useState<number>();
   const [selectedPage, setSelectedPage] = useState<number | null>(null);
 
-  // New state to track zoom toggle
+  // State to track zoom toggle
   const [isZoomed, setIsZoomed] = useState(false);
 
   // Store window dimensions to calculate "Fit to Screen"
@@ -51,7 +52,8 @@ export const PdfTable = ({ fileUrl }: { fileUrl: string }) => {
       <Document
         file={fileUrl}
         onLoadSuccess={onDocumentLoadSuccess}
-        loading={<div className="text-center p-10">Loading PDF...</div>}
+        // Use the animated skeleton while the PDF is fetching/parsing
+        loading={<PageSkeleton />}
         error={
           <div className="text-red-500 text-center p-10">
             Failed to load PDF.
@@ -59,13 +61,13 @@ export const PdfTable = ({ fileUrl }: { fileUrl: string }) => {
         }
         className="flex justify-center"
       >
-        {/* 1. GRID VIEW (Unchanged) */}
+        {/* 1. GRID VIEW */}
         {numPages && (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full">
             {Array.from(new Array(numPages), (el, index) => (
               <div
                 key={`page_${index + 1}`}
-                className="flex flex-col items-center bg-gray-50 border rounded-lg p-2 shadow-sm hover:shadow-md transition-shadow cursor-pointer hover:ring-2 hover:ring-blue-400"
+                className="flex flex-col items-center bg-gray-50 dark:bg-secondary border border-border rounded-lg p-2 shadow-sm hover:shadow-md transition-shadow cursor-pointer hover:ring-2 hover:ring-primary"
                 onClick={() => setSelectedPage(index + 1)}
               >
                 <Page
@@ -75,7 +77,7 @@ export const PdfTable = ({ fileUrl }: { fileUrl: string }) => {
                   width={250}
                   className="mb-2 pointer-events-none"
                 />
-                <span className="text-sm text-gray-500 font-medium select-none">
+                <span className="text-sm text-text-muted font-medium select-none">
                   Page {index + 1}
                 </span>
               </div>
@@ -89,12 +91,8 @@ export const PdfTable = ({ fileUrl }: { fileUrl: string }) => {
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-200"
             onClick={closeModal}
           >
-            {/* Container for the Page:
-               - If zoomed: allow scrolling (overflow-auto) and align top
-               - If fit: center everything (items-center) and hide overflow
-            */}
             <div
-              className={`relative bg-white shadow-2xl transition-all duration-300 ease-in-out
+              className={`relative bg-background shadow-2xl transition-all duration-300 ease-in-out
                 ${
                   isZoomed
                     ? "w-full h-full overflow-auto p-4 flex justify-center items-start"
@@ -121,9 +119,6 @@ export const PdfTable = ({ fileUrl }: { fileUrl: string }) => {
                   pageNumber={selectedPage}
                   renderTextLayer={false}
                   renderAnnotationLayer={false}
-                  // LOGIC:
-                  // If NOT zoomed: Height = Window Height - 100px (padding)
-                  // If Zoomed: Width = Window Width - 50px (fills width, forces scroll)
                   height={!isZoomed ? windowSize.height - 80 : undefined}
                   width={isZoomed ? windowSize.width - 40 : undefined}
                 />

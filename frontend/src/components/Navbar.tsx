@@ -4,7 +4,7 @@ import { FaBookOpen } from "react-icons/fa";
 
 function Navbar() {
   return (
-    <nav className="bg-elevated border-b border-border py-4 px-6 flex items-center justify-between">
+    <nav className="bg-secondary border-b border-border py-4 px-6 flex items-center justify-between">
       <div>
         <Link href="/">
           <div className="flex items-center gap-4 transition-opacity hover:opacity-80 cursor-pointer">

@@ -2,7 +2,7 @@
 
 @theme {
   /* Light mode colors (default) */
-  --color-primary: #fb923c;
+  --color-primary: #ff6600;
   --color-secondary: #f9fafb;
   --color-accent: #f59e0b;
   --color-background: #ffffff;
@@ -14,7 +14,7 @@
 
 /* Dark mode with class */
 .dark {
-  --color-primary: #fb923c;
+  --color-primary: #ff6600;
   --color-secondary: #1f2937;
   --color-accent: #fbbf24;
   --color-background: #111827;

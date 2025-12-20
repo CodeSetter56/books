@@ -7,7 +7,7 @@ export default function BookCard({ book }: { book: IBook }) {
   const genres = ["Fiction", "Sci-Fi", "Adventure", "History", "Biography"];
 
   return (
-    <div className="flex gap-5 border p-5 shadow-md rounded-xl bg-secondary border-border">
+    <div className="flex flex-col md:flex-row gap-5 border p-5 shadow-md rounded-xl bg-secondary border-border">
       <Image
         className="rounded-xl"
         src={book.coverimg}
@@ -22,7 +22,7 @@ export default function BookCard({ book }: { book: IBook }) {
         <h2 className="line-clamp-2 text-xl font-bold text-primary text-balance capitalize">
           {book.title}
         </h2>
-        <p className="font-bold text-text text-xl mt-1">{book.author.name}</p>
+        <p className="font-bold text-text text-xl mt-1">By: {book.author.name}</p>
 
         <div className="grid grid-cols-2 my-auto gap-3">
           {genres.slice(0, 4).map((genre, index) => {
