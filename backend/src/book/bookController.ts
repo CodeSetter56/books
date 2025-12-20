@@ -131,7 +131,7 @@ export const getAllBooks = async (req: Request, res: Response, next: NextFunctio
     const limit = parseInt(req.query.limit as string) || 3;
     const skip = (page - 1) * limit;
 
-    const booksQuery = Book.find().skip(skip).limit(limit);
+    const booksQuery = Book.find().skip(skip).limit(limit).populate('author', 'name email');
     const totalBooks = await Book.countDocuments();
     const books = await booksQuery.exec();
 
@@ -159,7 +159,7 @@ export const getBook = async (req: Request, res: Response, next: NextFunction) =
   const bookId = req.params.bookId;
 
   try {
-    const book = await Book.findById(bookId);
+    const book = await Book.findById(bookId).populate('author', 'name email');
     if (!book) {
       return next(createHttpError(404, "Book not found"));
     }

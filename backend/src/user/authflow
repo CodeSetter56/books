@@ -1,0 +1,2 @@
+So what I am getting is the user locks in and the access token is created. This access token is used to authenticate the user using the authentication middleware and it is used as a header for performing any trade operations and after you logout the cookie gets cleared and you cannot use refresh token anymore
+The refresh route is only called to renew the access token when the access token expires after 15 mins but the cookie is still active i.e, the user hasnt logged in

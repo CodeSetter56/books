@@ -1,7 +1,8 @@
 import {config as conf} from 'dotenv';
 import path from "path";
 
-conf({ path: path.resolve(__dirname, "../../../.env") });
+conf({ path: path.resolve(__dirname, "../../.env") });
+// conf({ path: path.resolve(process.cwd(), "..", ".env") });
 
 const _config = {
 

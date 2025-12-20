@@ -1,0 +1,15 @@
+export interface IBook {
+  _id: string;
+  title: string;
+  genre: string;
+  author: IUser;
+  coverimg: string;
+  file: string;
+}
+
+export interface IUser {
+  _id: string;
+  name: string;
+  email: string;
+  password: string;
+}
