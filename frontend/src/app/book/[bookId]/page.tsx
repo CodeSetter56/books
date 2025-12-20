@@ -3,6 +3,8 @@ import { IBook } from "@/types/types";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import PdfViewerWrapper from "./PdfViewerWrapper";
+import { Suspense } from "react";
+import Skeleton from "@/components/Skeleton";
 
 type Props = {
   params: Promise<{ bookId: string }>;
@@ -69,7 +71,9 @@ async function ViewBook({ params }: Props) {
 
       {/* PDF Grid View */}
       <div>
+        <Suspense fallback={<div><Skeleton /></div>}>
         <PdfViewerWrapper fileUrl={book.file} />
+        </Suspense>
       </div>
     </div>
   );

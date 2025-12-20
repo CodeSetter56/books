@@ -1,5 +1,5 @@
 import BooksTable from "@/components/BooksTable";
-import { config } from "@/config/config";
+import Skeleton from "@/components/Skeleton";
 import { Suspense } from "react";
 
 export default async function Home() {
@@ -13,7 +13,7 @@ export default async function Home() {
           Browse, create, read till your heart's content
         </div>
       </div>
-      <Suspense fallback={<div>Loading books...</div>}>
+      <Suspense fallback={<Skeleton />}>
         <BooksTable />
       </Suspense>
     </div>
