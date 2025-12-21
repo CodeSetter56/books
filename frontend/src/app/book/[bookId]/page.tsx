@@ -1,3 +1,5 @@
+// codesetter56/books/books-ce91c92da01eb2e7b923e09be8526d9ec58b11e6/frontend/src/app/book/[bookId]/page.tsx
+
 import { config } from "@/config/config";
 import { IBook } from "@/types/types";
 import Image from "next/image";
@@ -34,8 +36,8 @@ async function ViewBook({ params }: Props) {
 
   return (
     <div className="container mx-auto mt-10 p-5">
-      <div className="flex flex-col md:flex-row gap-8 border p-5 shadow-md rounded-xl bg-secondary border-border mb-10">
-        <div className="relative w-full md:w-1/3 h-96">
+      <div className="flex flex-col md:flex-row gap-8 border p-5 shadow-md rounded-xl bg-secondary border-border mb-10 min-h-[400px]">
+        <div className="relative w-full md:w-1/3 h-96 flex-shrink-0">
           <Image
             className="rounded-xl object-cover"
             src={book.coverimg}
@@ -45,32 +47,37 @@ async function ViewBook({ params }: Props) {
           />
         </div>
 
-        <div className="flex flex-col gap-4 w-full relative">
-          <h2 className="text-7xl font-bold text-primary text-balance capitalize mb-2">
+        {/* Using flex-col with mt-auto instead of absolute positioning */}
+        <div className="flex flex-col w-full">
+          <h2 className="text-4xl md:text-7xl font-bold text-primary text-balance capitalize mb-2">
             {book.title}
           </h2>
-          <p className="font-bold text-text text-3xl mb-4 text-primary-500">
+          <p className="font-bold text-text text-xl md:text-3xl mb-2 text-primary-500">
             By {book.author.name}
           </p>
-          <p className="font-bold text-text-muted text-md mb-4 text-primary-500 italic">
+          <p className="font-bold text-text-muted text-sm mb-6 text-primary-500 italic">
             Contact: {book.author.email}
           </p>
 
-          <div className="mb-4">
+          <div className="mb-6">
             <h3 className="font-semibold text-text-muted mb-2">Genre</h3>
-            <div className="flex flex-wrap gap-2">{book.genre}</div>
+            <div className="flex flex-wrap gap-2 text-primary">
+              <span className="px-3 py-1 border border-border rounded-lg bg-background">
+                {book.genre}
+              </span>
+            </div>
           </div>
 
-          <div className="bottom-0 absolute">
-            <button className="px-4 py-2 border border-primary text-primary rounded-2xl">
+          <div className="mt-auto pt-4">
+            <button className="px-6 py-2 border border-primary text-primary rounded-2xl hover:bg-primary hover:text-white transition-colors">
               Download Book
             </button>
           </div>
         </div>
       </div>
 
-      {/* PDF Grid View */}
-      <div>
+      {/* Container to handle PDF overflow on mobile */}
+      <div className="w-full overflow-x-auto">
         <Suspense
           fallback={
             <div>
