@@ -1,12 +1,12 @@
 // codesetter56/books/books-ce91c92da01eb2e7b923e09be8526d9ec58b11e6/frontend/src/app/book/[bookId]/page.tsx
 
-import { config } from "@/config/config";
-import { IBook } from "@/types/types";
+import { config } from "@/lib/config";
+import { IBook } from "@/features/books/BookTypes";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import PdfViewerWrapper from "./PdfViewerWrapper";
 import { Suspense } from "react";
 import Skeleton from "@/components/Skeletons/CardSkeleton";
+import PdfViewerWrapper from "@/features/pdf/components/PdfViewerWrapper";
 
 type Props = {
   params: Promise<{ bookId: string }>;

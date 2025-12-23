@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import PageSkeleton from "@/components/Skeletons/PageSkeleton";
 
 const PdfTable = dynamic(
-  () => import("./PdfTable").then((mod) => mod.PdfTable),
+  () => import("../../../features/pdf/PdfTable").then((mod) => mod.PdfTable),
   {
     ssr: false,
     // Replace the text div with the Skeleton component

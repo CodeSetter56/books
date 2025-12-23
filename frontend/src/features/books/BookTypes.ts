@@ -13,3 +13,9 @@ export interface IUser {
   email: string;
   password: string;
 }
+
+export interface IBookParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+}

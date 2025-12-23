@@ -1,8 +1,7 @@
-import BookPanel from "@/components/Book/BookPanel";
-import BooksTable from "@/components/Book/BooksTable";
+import BookPanel from "@/features/books/components/BookPanel";
 import CardSkeleton from "@/components/Skeletons/CardSkeleton";
 import { Suspense } from "react";
-import { config } from "@/config/config";
+import BooksTable from "@/features/books/components/BooksTable";
 
 export default async function Home({
   searchParams,
@@ -10,16 +9,6 @@ export default async function Home({
   searchParams: Promise<{ page?: string; search?: string }>;
 }) {
   const { page, search } = await searchParams;
-  const currentPage = parseInt(page || "1");
-  const searchQuery = search || "";
-
-  // Fetch initial metadata to get totalPages for the Panel
-  const res = await fetch(
-    `${config.backend_url}/books?page=${currentPage}&limit=6&search=${searchQuery}`,
-    { cache: "no-store" }
-  );
-  const data = await res.json();
-  const totalPages = data.totalPages || 1;
 
   return (
     <div className="w-full p-8">
@@ -34,7 +23,7 @@ export default async function Home({
 
       <div className="w-full mt-12 border border-border rounded-2xl p-4 ">
         <div className="p-4 bg-secondary rounded-2xl border border-border">
-          <BookPanel totalPages={totalPages} />
+          <BookPanel/>
         </div>
         <Suspense
           fallback={
@@ -42,9 +31,8 @@ export default async function Home({
               <CardSkeleton />
             </div>
           }
-          key={`${currentPage}-${searchQuery}`}
         >
-          <BooksTable page={currentPage} search={searchQuery} />
+          <BooksTable/>
         </Suspense>
       </div>
     </div>
