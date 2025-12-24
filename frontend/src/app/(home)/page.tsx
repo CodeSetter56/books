@@ -1,14 +1,34 @@
+// frontend/src/app/(home)/page.tsx
+
 import BookPanel from "@/features/books/components/BookPanel";
 import CardSkeleton from "@/components/Skeletons/CardSkeleton";
 import { Suspense } from "react";
 import BooksTable from "@/features/books/components/BooksTable";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { getQueryClient } from "@/providers/getQueryClient";
+import getBooks from "@/features/books/BookService";
+import { paginationDefaults } from "@/config/constants";
 
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; search?: string }>;
+  searchParams: Promise<{ page?: string; search?: string; limit?: string }>;
 }) {
-  const { page, search } = await searchParams;
+
+  const { page, search, limit } = await searchParams;
+  const queryClient = getQueryClient();
+
+  const params = {
+    page: Number(page) || paginationDefaults.PAGE,
+    limit: Number(limit) || paginationDefaults.LIMIT,
+    search: search || paginationDefaults.SEARCH,
+  };
+
+  // Prefetch data on server
+  await queryClient.prefetchQuery({
+    queryKey: ["books", params],
+    queryFn: () => getBooks(params),
+  });
 
   return (
     <div className="w-full p-8">
@@ -22,18 +42,20 @@ export default async function Home({
       </div>
 
       <div className="w-full mt-12 border border-border rounded-2xl p-4 ">
-        <div className="p-4 bg-secondary rounded-2xl border border-border">
-          <BookPanel/>
-        </div>
-        <Suspense
-          fallback={
-            <div className="mt-10">
-              <CardSkeleton />
-            </div>
-          }
-        >
-          <BooksTable/>
-        </Suspense>
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <div className="p-4 bg-secondary rounded-2xl border border-border">
+            <BookPanel />
+          </div>
+          <Suspense
+            fallback={
+              <div className="mt-10">
+                <CardSkeleton />
+              </div>
+            }
+          >
+            <BooksTable />
+          </Suspense>
+        </HydrationBoundary>
       </div>
     </div>
   );
