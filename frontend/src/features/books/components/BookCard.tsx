@@ -54,7 +54,6 @@ export default function BookCard({ book }: { book: IBook }) {
           })}
         </div>
 
-        {/* mt-auto pushes the button to the bottom regardless of content height */}
         <div className="mt-auto">
           <Link
             href={`/book/${book._id}`}

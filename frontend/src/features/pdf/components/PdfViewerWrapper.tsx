@@ -3,11 +3,11 @@
 import dynamic from "next/dynamic";
 import PageSkeleton from "@/components/Skeletons/PageSkeleton";
 
+// Fix the path to point to the local component
 const PdfTable = dynamic(
-  () => import("../../../features/pdf/PdfTable").then((mod) => mod.PdfTable),
+  () => import("./PdfTable").then((mod) => mod.PdfTable),
   {
     ssr: false,
-    // Replace the text div with the Skeleton component
     loading: () => <PageSkeleton />,
   }
 );

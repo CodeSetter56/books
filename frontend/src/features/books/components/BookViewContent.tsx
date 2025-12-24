@@ -50,10 +50,9 @@ export default function BookViewContent() {
         </div>
       </div>
 
-      {/* 2. The PDF Table/Viewer Wrapper
       <div className="w-full overflow-x-auto">
         <PdfViewerWrapper fileUrl={book.file} />
-      </div> */}
+      </div>
     </div>
   );
 }
