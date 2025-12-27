@@ -21,17 +21,18 @@ export const PdfTable = ({ fileUrl }: { fileUrl: string }) => {
         loading={<PageSkeleton />}
         className="flex flex-col items-center"
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full">
+        {/* Added justify-items-center for grid alignment */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full justify-items-center">
           {Array.from(new Array(numPages), (_, i) => (
             <div
               key={i}
-              className="cursor-pointer group"
+              className="cursor-pointer group flex flex-col items-center"
               onClick={() => updateParams({ page: String(i + 1) })}
             >
-              <div className="w-full bg-white rounded shadow-sm group-hover:border-primary border transition-all overflow-hidden">
+              <div className="w-fit bg-white rounded shadow-sm group-hover:border-primary border transition-all overflow-hidden">
                 <Page
                   pageNumber={i + 1}
-                  width={250} // Fixed width for thumbnails is fine; CSS handles grid
+                  width={250}
                   renderTextLayer={false}
                   renderAnnotationLayer={false}
                 />
