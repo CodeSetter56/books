@@ -1,7 +1,6 @@
 "use client";
 
 import { paginationDefaults } from "@/config/constants";
-import { useBooks } from "@/features/books/hooks/useBooks";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -11,33 +10,30 @@ import {
   MdOutlineKeyboardDoubleArrowRight,
 } from "react-icons/md";
 
-function Pagination() {
-  const router = useRouter();
-  const [inputValue, setInputValue] = useState("");
-  const searchParams = useSearchParams();
+interface PaginationProps {
+  totalPages: number;
+}
 
-  const limit = Number(searchParams.get("limit")) || paginationDefaults.LIMIT;
-  const search = searchParams.get("search") || paginationDefaults.SEARCH;
-  let currentPage = Number(searchParams.get("page")) || paginationDefaults.PAGE;
+function Pagination({ totalPages }: PaginationProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [inputValue, setInputValue] = useState("");
+
+  const currentPage =
+    Number(searchParams.get("page")) || paginationDefaults.PAGE;
 
   useEffect(() => {
     setInputValue(currentPage.toString());
   }, [currentPage]);
 
-  const { data, isLoading, error } = useBooks({
-    page: currentPage,
-    limit,
-    search,
-  });
-
-  const totalPages = data?.totalPages || 1;
   const isFirstPage = currentPage <= 1;
   const isLastPage = currentPage >= totalPages;
 
   const updateUrl = (newPage: number) => {
     const params = new URLSearchParams(searchParams);
     params.set("page", newPage.toString());
-    router.push(`?${params.toString()}`);
+    // Using { scroll: false } prevents the page from jumping to top on page change
+    router.push(`?${params.toString()}`, { scroll: false });
   };
 
   const handleInputSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -55,7 +51,7 @@ function Pagination() {
     <div className="w-full flex items-center justify-center">
       <div className="flex items-center">
         <button
-          disabled={currentPage === 1}
+          disabled={isFirstPage}
           onClick={() => updateUrl(1)}
           className={
             isFirstPage ? "text-text-muted" : "text-primary cursor-pointer"
@@ -74,7 +70,7 @@ function Pagination() {
         </button>
       </div>
 
-      <div className="flex flex-col md:flex-row items-center gap-1">
+      <div className="flex flex-col md:flex-row items-center gap-1 mx-4">
         <input
           type="text"
           value={inputValue}

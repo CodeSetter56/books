@@ -1,17 +1,33 @@
-// src/features/pdf/components/PdfTable.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
+import { useRouter, useSearchParams } from "next/navigation";
 import PageSkeleton from "@/components/Skeletons/PageSkeleton";
 import { PdfModal } from "./PdfModal";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 export const PdfTable = ({ fileUrl }: { fileUrl: string }) => {
-  const [numPages, setNumPages] = useState<number>();
-  const [selectedPage, setSelectedPage] = useState<number | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [numPages, setNumPages] = useState<number>(0);
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+
+  // Get selected page from URL instead of local state
+  const selectedPage = searchParams.get("page")
+    ? Number(searchParams.get("page"))
+    : null;
+
+  const handlePageSelect = (page: number | null) => {
+    const params = new URLSearchParams(searchParams);
+    if (page) {
+      params.set("page", page.toString());
+    } else {
+      params.delete("page");
+    }
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
 
   useEffect(() => {
     function handleResize() {
@@ -24,7 +40,9 @@ export const PdfTable = ({ fileUrl }: { fileUrl: string }) => {
 
   useEffect(() => {
     document.body.style.overflow = selectedPage ? "hidden" : "unset";
-    return () => { document.body.style.overflow = "unset"; };
+    return () => {
+      document.body.style.overflow = "unset";
+    };
   }, [selectedPage]);
 
   return (
@@ -33,16 +51,20 @@ export const PdfTable = ({ fileUrl }: { fileUrl: string }) => {
         file={fileUrl}
         onLoadSuccess={({ numPages }) => setNumPages(numPages)}
         loading={<PageSkeleton />}
-        error={<div className="text-red-500 text-center p-10 font-bold">Failed to load PDF document.</div>}
+        error={
+          <div className="text-red-500 text-center p-10 font-bold">
+            Failed to load PDF document.
+          </div>
+        }
         className="flex flex-col items-center"
       >
-        {numPages && (
+        {numPages > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full">
             {Array.from(new Array(numPages), (_, index) => (
               <div
                 key={`page_${index + 1}`}
                 className="flex flex-col items-center bg-secondary border border-border rounded-lg p-2 shadow-sm hover:border-primary cursor-pointer group transition-all"
-                onClick={() => setSelectedPage(index + 1)}
+                onClick={() => handlePageSelect(index + 1)}
               >
                 <div className="w-full overflow-hidden rounded shadow-inner bg-white">
                   <Page
@@ -64,8 +86,8 @@ export const PdfTable = ({ fileUrl }: { fileUrl: string }) => {
         {selectedPage && (
           <PdfModal
             selectedPage={selectedPage}
-            numPages={numPages || 0}
-            onClose={() => setSelectedPage(null)}
+            numPages={numPages}
+            onClose={() => handlePageSelect(null)}
             windowSize={windowSize}
           />
         )}

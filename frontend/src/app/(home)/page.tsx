@@ -1,6 +1,3 @@
-// frontend/src/app/(home)/page.tsx
-
-import BookPanel from "@/features/books/components/BookPanel";
 import CardSkeleton from "@/components/Skeletons/CardSkeleton";
 import { Suspense } from "react";
 import BooksTable from "@/features/books/components/BooksTable";
@@ -43,9 +40,7 @@ export default async function Home({
 
       <div className="w-full mt-12 border border-border rounded-2xl p-4 ">
         <HydrationBoundary state={dehydrate(queryClient)}>
-          <div className="p-4 bg-secondary rounded-2xl border border-border">
-            <BookPanel />
-          </div>
+   
           <Suspense
             fallback={
               <div className="mt-10">
