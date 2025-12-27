@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Page } from "react-pdf";
 import { useUrlState } from "@/hooks/useUrlState";
 import Pagination from "@/components/Pagination";
@@ -14,13 +14,20 @@ export const PdfModal = ({
   numPages: number;
   onClose: () => void;
 }) => {
-  const { getParam, updateParams } = useUrlState();
+  const { getParam, updateParams, replaceParams } = useUrlState();
 
-  // Persist view state in URL
   const isZoomed = getParam("zoom") === "true";
   const isSideBySide = getParam("view") === "double";
 
-  // Remove outer scrollbar when modal is active
+  // Calculate which pages to show
+  const pagesToRender = useMemo(() => {
+    const pages = [selectedPage];
+    if (isSideBySide && selectedPage < numPages) {
+      pages.push(selectedPage + 1);
+    }
+    return pages;
+  }, [selectedPage, isSideBySide, numPages]);
+
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -28,13 +35,22 @@ export const PdfModal = ({
     };
   }, []);
 
+  // Preload adjacent pages for instant navigation
+  const preloadPages = useMemo(() => {
+    const toPreload = [];
+    if (selectedPage > 1) toPreload.push(selectedPage - 1);
+    if (selectedPage < numPages) toPreload.push(selectedPage + 1);
+    if (isSideBySide && selectedPage < numPages - 1)
+      toPreload.push(selectedPage + 2);
+    return toPreload;
+  }, [selectedPage, numPages, isSideBySide]);
+
   return (
     <div className="fixed inset-0 z-[100] flex flex-col bg-black/95 backdrop-blur-md overflow-hidden">
-      {/* Modal Header: Added z-10 and shrink-0 to prevent overlap and compression */}
       <div className="h-16 bg-secondary flex items-center justify-between px-6 border-b border-border z-10 shrink-0">
         <button
           onClick={() =>
-            updateParams({ view: isSideBySide ? "single" : "double" })
+            replaceParams({ view: isSideBySide ? "single" : "double" })
           }
           className="hidden lg:block px-4 py-1 border border-primary text-primary rounded hover:bg-primary/10 transition-colors"
         >
@@ -42,7 +58,7 @@ export const PdfModal = ({
         </button>
 
         <div className="flex-1 max-w-xs">
-          <Pagination totalPages={numPages} />
+          <Pagination totalPages={numPages} useReplace={true} />
         </div>
 
         <button
@@ -53,34 +69,38 @@ export const PdfModal = ({
         </button>
       </div>
 
-      {/* Main Content Area: Added justify-center and conditional items-start */}
       <div
-        className={`grow overflow-auto p-10 flex justify-center ${
+        className={`grow overflow-auto px-10 pb-10 pt-6 flex justify-center ${
           isZoomed ? "items-start" : "items-center"
         }`}
       >
-        <div 
+        <div
           className="flex gap-8 cursor-zoom-in mx-auto h-fit"
-          onClick={() => updateParams({ zoom: isZoomed ? "false" : "true" })}
+          onClick={() => replaceParams({ zoom: isZoomed ? "false" : "true" })}
         >
-          <div className="shadow-2xl">
-            <Page
-              pageNumber={selectedPage}
-              height={isZoomed ? 1200 : 800}
-              renderTextLayer={false}
-              renderAnnotationLayer={false}
-            />
-          </div>
-          {isSideBySide && selectedPage < numPages && (
-            <div className="shadow-2xl">
+          {pagesToRender.map((pageNum) => (
+            <div key={pageNum} className="shadow-2xl">
               <Page
-                pageNumber={selectedPage + 1}
+                pageNumber={pageNum}
                 height={isZoomed ? 1200 : 800}
                 renderTextLayer={false}
                 renderAnnotationLayer={false}
               />
             </div>
-          )}
+          ))}
+        </div>
+
+        {/* Hidden preload pages - rendered but not visible */}
+        <div className="hidden">
+          {preloadPages.map((pageNum) => (
+            <Page
+              key={`preload-${pageNum}`}
+              pageNumber={pageNum}
+              height={isZoomed ? 1200 : 800}
+              renderTextLayer={false}
+              renderAnnotationLayer={false}
+            />
+          ))}
         </div>
       </div>
     </div>

@@ -15,9 +15,18 @@ export const useUrlState = () => {
       if (value === null) params.delete(key);
       else params.set(key, value);
     });
-    // { scroll: false } prevents jump-to-top on page change
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
-  return { getParam, updateParams, searchParams };
+  // NEW: Use replace instead of push for modal-only updates
+  const replaceParams = (updates: Record<string, string | null>) => {
+    const params = new URLSearchParams(searchParams);
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null) params.delete(key);
+      else params.set(key, value);
+    });
+    router.replace(`?${params.toString()}`, { scroll: false });
+  };
+
+  return { getParam, updateParams, replaceParams, searchParams };
 };

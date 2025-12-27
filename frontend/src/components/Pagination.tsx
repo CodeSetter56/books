@@ -9,13 +9,21 @@ import {
   MdOutlineKeyboardDoubleArrowRight,
 } from "react-icons/md";
 
-export default function Pagination({ totalPages }: { totalPages: number }) {
-  const { getParam, updateParams } = useUrlState();
+export default function Pagination({
+  totalPages,
+  useReplace = false,
+}: {
+  totalPages: number;
+  useReplace?: boolean;
+}) {
+  const { getParam, updateParams, replaceParams } = useUrlState();
   const currentPage = Number(getParam("page", String(paginationDefaults.PAGE)));
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
-      updateParams({ page: String(newPage) });
+      // Use replaceParams if in modal context, otherwise updateParams
+      const paramUpdater = useReplace ? replaceParams : updateParams;
+      paramUpdater({ page: String(newPage) });
     }
   };
 
@@ -40,7 +48,7 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
 
       <div className="flex items-center gap-1">
         <input
-          key={currentPage} // Forces re-render when page changes via buttons
+          key={currentPage}
           type="text"
           defaultValue={currentPage}
           onBlur={(e) => handlePageChange(Number(e.target.value))}
@@ -57,7 +65,7 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
           disabled={currentPage >= totalPages}
           onClick={() => handlePageChange(currentPage + 1)}
           className="disabled:text-text-muted disabled:cursor-default text-primary cursor-pointer"
-          >
+        >
           <MdOutlineKeyboardArrowRight size={30} />
         </button>
         <button
