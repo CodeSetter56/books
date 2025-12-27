@@ -1,49 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useUrlState } from "@/hooks/useUrlState";
 import PageSkeleton from "@/components/Skeletons/PageSkeleton";
 import { PdfModal } from "./PdfModal";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 export const PdfTable = ({ fileUrl }: { fileUrl: string }) => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const [numPages, setNumPages] = useState<number>(0);
-  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
-
-  // Get selected page from URL instead of local state
-  const selectedPage = searchParams.get("page")
-    ? Number(searchParams.get("page"))
-    : null;
-
-  const handlePageSelect = (page: number | null) => {
-    const params = new URLSearchParams(searchParams);
-    if (page) {
-      params.set("page", page.toString());
-    } else {
-      params.delete("page");
-    }
-    router.push(`?${params.toString()}`, { scroll: false });
-  };
-
-  useEffect(() => {
-    function handleResize() {
-      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-    }
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  useEffect(() => {
-    document.body.style.overflow = selectedPage ? "hidden" : "unset";
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [selectedPage]);
+  const { getParam, updateParams } = useUrlState();
+  const selectedPage = getParam("page") ? Number(getParam("page")) : null;
 
   return (
     <div className="w-full">
@@ -51,44 +19,33 @@ export const PdfTable = ({ fileUrl }: { fileUrl: string }) => {
         file={fileUrl}
         onLoadSuccess={({ numPages }) => setNumPages(numPages)}
         loading={<PageSkeleton />}
-        error={
-          <div className="text-red-500 text-center p-10 font-bold">
-            Failed to load PDF document.
-          </div>
-        }
         className="flex flex-col items-center"
       >
-        {numPages > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full">
-            {Array.from(new Array(numPages), (_, index) => (
-              <div
-                key={`page_${index + 1}`}
-                className="flex flex-col items-center bg-secondary border border-border rounded-lg p-2 shadow-sm hover:border-primary cursor-pointer group transition-all"
-                onClick={() => handlePageSelect(index + 1)}
-              >
-                <div className="w-full overflow-hidden rounded shadow-inner bg-white">
-                  <Page
-                    pageNumber={index + 1}
-                    renderTextLayer={false}
-                    renderAnnotationLayer={false}
-                    width={windowSize.width < 640 ? windowSize.width - 60 : 250}
-                    className="mb-2 pointer-events-none group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <span className="text-sm text-text-muted font-bold py-2 group-hover:text-primary transition-colors">
-                  Page {index + 1}
-                </span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full">
+          {Array.from(new Array(numPages), (_, i) => (
+            <div
+              key={i}
+              className="cursor-pointer group"
+              onClick={() => updateParams({ page: String(i + 1) })}
+            >
+              <div className="w-full bg-white rounded shadow-sm group-hover:border-primary border transition-all overflow-hidden">
+                <Page
+                  pageNumber={i + 1}
+                  width={250} // Fixed width for thumbnails is fine; CSS handles grid
+                  renderTextLayer={false}
+                  renderAnnotationLayer={false}
+                />
               </div>
-            ))}
-          </div>
-        )}
+              <p className="text-center text-sm font-bold mt-2">Page {i + 1}</p>
+            </div>
+          ))}
+        </div>
 
         {selectedPage && (
           <PdfModal
             selectedPage={selectedPage}
             numPages={numPages}
-            onClose={() => handlePageSelect(null)}
-            windowSize={windowSize}
+            onClose={() => updateParams({ page: null })}
           />
         )}
       </Document>

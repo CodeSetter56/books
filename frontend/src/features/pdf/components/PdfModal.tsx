@@ -1,82 +1,68 @@
 "use client";
 
-import { useState } from "react";
 import { Page } from "react-pdf";
+import { useUrlState } from "@/hooks/useUrlState";
 import Pagination from "@/components/Pagination";
-
-interface PdfModalProps {
-  selectedPage: number;
-  numPages: number;
-  onClose: () => void;
-  windowSize: { width: number; height: number };
-}
 
 export const PdfModal = ({
   selectedPage,
   numPages,
   onClose,
-  windowSize,
-}: PdfModalProps) => {
-  const [isZoomed, setIsZoomed] = useState(false);
-  const [isSideBySide, setIsSideBySide] = useState(false);
+}: {
+  selectedPage: number;
+  numPages: number;
+  onClose: () => void;
+}) => {
+  const { getParam, updateParams } = useUrlState();
 
-  const baseHeight = windowSize.height - 180; // Adjusted for Pagination height
-  const zoomedHeight = windowSize.height * 1.8;
-  const currentRenderHeight = isZoomed ? zoomedHeight : baseHeight;
+  // Persist view state in URL
+  const isZoomed = getParam("zoom") === "true";
+  const isSideBySide = getParam("view") === "double";
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-black/95 backdrop-blur-md overflow-hidden">
-      {/* Header */}
-      <div className="w-full h-16 bg-secondary border-b border-border flex items-center justify-between px-6 z-[60] shadow-2xl">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => setIsSideBySide(!isSideBySide)}
-            className="hidden lg:block px-4 py-1.5 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-all font-semibold"
-          >
-            {isSideBySide ? "Single View" : "Side-by-Side"}
-          </button>
-        </div>
+      <div className="h-16 bg-secondary flex items-center justify-between px-6 border-b border-border">
+        <button
+          onClick={() =>
+            updateParams({ view: isSideBySide ? "single" : "double" })
+          }
+          className="hidden lg:block px-4 py-1 border border-primary text-primary rounded"
+        >
+          {isSideBySide ? "Single View" : "Side-by-Side"}
+        </button>
 
-        <div className="flex-1 max-w-sm">
+        <div className="flex-1 max-w-xs">
           <Pagination totalPages={numPages} />
         </div>
 
         <button
           onClick={onClose}
-          className="text-white bg-red-600 rounded-full w-10 h-10 flex items-center justify-center font-bold hover:bg-red-500 transition-colors ml-4"
+          className="bg-red-600 text-white rounded-full w-8 h-8"
         >
           ✕
         </button>
       </div>
 
-      {/* PDF View Area */}
       <div
-        className={`grow w-full overflow-auto p-4 md:p-10 flex ${
-          isZoomed ? "items-start justify-start" : "items-center justify-center"
+        className={`grow overflow-auto p-10 flex ${
+          isZoomed ? "items-start" : "items-center justify-center"
         }`}
+        onClick={() => updateParams({ zoom: isZoomed ? "false" : "true" })}
       >
-        <div
-          className="flex gap-4 md:gap-8 transition-all duration-300 cursor-pointer min-w-max mx-auto h-fit"
-          onClick={() => setIsZoomed(!isZoomed)}
-        >
-          <div className="shadow-2xl border border-white/10 bg-white leading-[0]">
+        <div className="flex gap-8 cursor-zoom-in">
+          <Page
+            pageNumber={selectedPage}
+            height={isZoomed ? 1200 : 800}
+            renderTextLayer={false}
+            renderAnnotationLayer={false}
+          />
+          {isSideBySide && selectedPage < numPages && (
             <Page
-              pageNumber={selectedPage}
+              pageNumber={selectedPage + 1}
+              height={isZoomed ? 1200 : 800}
               renderTextLayer={false}
               renderAnnotationLayer={false}
-              height={currentRenderHeight}
             />
-          </div>
-
-          {isSideBySide && selectedPage < numPages && (
-            <div className="shadow-2xl border border-white/10 bg-white leading-[0] hidden lg:block">
-              <Page
-                pageNumber={selectedPage + 1}
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-                height={currentRenderHeight}
-              />
-            </div>
           )}
         </div>
       </div>
