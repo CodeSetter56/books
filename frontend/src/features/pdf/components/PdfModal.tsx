@@ -14,12 +14,10 @@ export const PdfModal = ({
   numPages: number;
   onClose: () => void;
 }) => {
-  const { getParam, updateParams, replaceParams } = useUrlState();
-
+  const { getParam, replaceParams } = useUrlState();
   const [isZoomed, setIsZoomed] = useState(false);
   const isSideBySide = getParam("view") === "double";
 
-  // Calculate which pages to show
   const pagesToRender = useMemo(() => {
     const pages = [selectedPage];
     if (isSideBySide && selectedPage < numPages) {
@@ -30,27 +28,23 @@ export const PdfModal = ({
 
   const headerRef = useRef<HTMLDivElement | null>(null);
   const [availableHeight, setAvailableHeight] = useState<number | null>(null);
+  const [viewportWidth, setViewportWidth] = useState<number>(0);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
-
     const calc = () => {
       const headerH = headerRef.current?.offsetHeight || 64;
-      // leave some breathing room (padding/margins)
-      const pad = 32;
-      setAvailableHeight(window.innerHeight - headerH - pad);
+      setAvailableHeight(window.innerHeight - headerH - 32);
+      setViewportWidth(window.innerWidth);
     };
-
     calc();
     window.addEventListener("resize", calc);
-
     return () => {
       window.removeEventListener("resize", calc);
       document.body.style.overflow = "unset";
     };
   }, []);
 
-  // Preload adjacent pages for instant navigation
   const preloadPages = useMemo(() => {
     const toPreload = [];
     if (selectedPage > 1) toPreload.push(selectedPage - 1);
@@ -59,6 +53,25 @@ export const PdfModal = ({
       toPreload.push(selectedPage + 2);
     return toPreload;
   }, [selectedPage, numPages, isSideBySide]);
+
+  // Responsive scaling logic
+  const getPageProps = (isPreload = false) => {
+    const isMobile = viewportWidth < 768;
+
+    // On mobile, force width to fit screen minus padding
+    if (isMobile && !isZoomed) {
+      return { width: viewportWidth - 40 };
+    }
+
+    // On desktop or when zoomed, use height-based scaling
+    return {
+      height: isZoomed
+        ? 1200
+        : availableHeight
+        ? Math.max(200, availableHeight)
+        : 800,
+    };
+  };
 
   return (
     <div className="fixed inset-0 z-[100] flex flex-col bg-black/95 backdrop-blur-md overflow-hidden">
@@ -87,24 +100,18 @@ export const PdfModal = ({
         </button>
       </div>
 
-      <div
-        className={`grow overflow-auto px-10 pb-10 pt-6 flex justify-center items-start`}
-      >
+      <div className="grow overflow-auto p-4 md:p-10 flex flex-col items-center">
         <div
-          className="flex gap-8 cursor-zoom-in mx-auto h-fit"
+          className={`flex flex-wrap md:flex-nowrap gap-4 md:gap-8 h-fit mx-auto transition-all duration-300 justify-center ${
+            isZoomed ? "cursor-zoom-out" : "cursor-zoom-in"
+          }`}
           onClick={() => setIsZoomed((v) => !v)}
         >
           {pagesToRender.map((pageNum) => (
-            <div key={pageNum} className="shadow-2xl">
+            <div key={pageNum} className="shadow-2xl max-w-full">
               <Page
                 pageNumber={pageNum}
-                height={
-                  availableHeight
-                    ? Math.max(200, availableHeight)
-                    : isZoomed
-                    ? 1200
-                    : 800
-                }
+                {...getPageProps()}
                 renderTextLayer={false}
                 renderAnnotationLayer={false}
               />
@@ -112,13 +119,12 @@ export const PdfModal = ({
           ))}
         </div>
 
-        {/* Hidden preload pages - rendered but not visible */}
         <div className="hidden">
           {preloadPages.map((pageNum) => (
             <Page
               key={`preload-${pageNum}`}
               pageNumber={pageNum}
-              height={isZoomed ? 1200 : 800}
+              {...getPageProps(true)}
               renderTextLayer={false}
               renderAnnotationLayer={false}
             />

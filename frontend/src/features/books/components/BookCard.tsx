@@ -1,11 +1,10 @@
 import Image from "next/image";
-import Link from "next/link";
 import { IBook } from "../BookTypes";
 import LinkButton from "@/components/LinkButton";
 
 export default function BookCard({ book }: { book: IBook }) {
   return (
-    <div className="flex flex-col md:flex-row gap-5 border p-5 shadow-md rounded-xl bg-secondary border-border h-full">
+    <div className="flex flex-col md:flex-row gap-5 border p-5 shadow-md rounded-xl bg-secondary border-border h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <div className="flex-shrink-0 flex justify-center items-start">
         <Image
           className="rounded-xl object-cover"
@@ -32,7 +31,7 @@ export default function BookCard({ book }: { book: IBook }) {
         </div>
 
         <div className="mt-auto">
-          <LinkButton destination={`/book/${book._id}`} text="Read More"/>
+          <LinkButton destination={`/book/${book._id}`} text="Read More" />
         </div>
       </div>
     </div>

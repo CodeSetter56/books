@@ -21,7 +21,6 @@ export const PdfTable = ({ fileUrl }: { fileUrl: string }) => {
         loading={<PageSkeleton />}
         className="flex flex-col items-center"
       >
-        {/* Added justify-items-center for grid alignment */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full justify-items-center">
           {Array.from(new Array(numPages), (_, i) => (
             <div
@@ -29,7 +28,8 @@ export const PdfTable = ({ fileUrl }: { fileUrl: string }) => {
               className="cursor-pointer group flex flex-col items-center"
               onClick={() => updateParams({ page: String(i + 1) })}
             >
-              <div className="w-fit bg-white rounded shadow-sm group-hover:border-primary border transition-all overflow-hidden">
+              {/* Removed orange border and added subtle lift/shadow transition */}
+              <div className="w-fit bg-white rounded shadow-sm border border-transparent transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1 overflow-hidden">
                 <Page
                   pageNumber={i + 1}
                   width={250}
