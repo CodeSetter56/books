@@ -4,6 +4,7 @@ import { useBook } from "../hooks/useBook";
 import Image from "next/image";
 import { notFound, useParams } from "next/navigation";
 import PdfViewerWrapper from "@/features/pdf/components/PdfViewerWrapper";
+import Button from "@/components/Button";
 
 export default function BookViewContent() {
   const params = useParams();
@@ -39,13 +40,7 @@ export default function BookViewContent() {
             </h3>
           </div>
           <div className="mt-auto pt-4">
-            <a
-              href={book.file}
-              target="_blank"
-              className="px-6 py-2 border border-primary text-primary rounded-2xl hover:bg-primary hover:text-white transition-colors"
-            >
-              Download PDF
-            </a>
+            <Button text="Download PDF" />
           </div>
         </div>
       </div>

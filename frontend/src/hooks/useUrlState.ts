@@ -1,4 +1,3 @@
-// src/hooks/useUrlState.ts
 import { useRouter, useSearchParams } from "next/navigation";
 
 export const useUrlState = () => {

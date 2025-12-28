@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { MdHexagon } from "react-icons/md";
 import { FaBookOpen } from "react-icons/fa";
+import Button from "./Button";
 
 function Navbar() {
   return (
@@ -17,9 +18,7 @@ function Navbar() {
         </Link>
       </div>
       <div>
-        <button className="bg-primary py-2 px-4 rounded-2xl hover:opacity-80 text-white font-bold cursor-pointer">
-          Sign in
-        </button>
+        <Button text="Sign in"/>
       </div>
     </nav>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Page } from "react-pdf";
 import { useUrlState } from "@/hooks/useUrlState";
 import Pagination from "@/components/Pagination";
@@ -16,7 +16,7 @@ export const PdfModal = ({
 }) => {
   const { getParam, updateParams, replaceParams } = useUrlState();
 
-  const isZoomed = getParam("zoom") === "true";
+  const [isZoomed, setIsZoomed] = useState(false);
   const isSideBySide = getParam("view") === "double";
 
   // Calculate which pages to show
@@ -28,9 +28,24 @@ export const PdfModal = ({
     return pages;
   }, [selectedPage, isSideBySide, numPages]);
 
+  const headerRef = useRef<HTMLDivElement | null>(null);
+  const [availableHeight, setAvailableHeight] = useState<number | null>(null);
+
   useEffect(() => {
     document.body.style.overflow = "hidden";
+
+    const calc = () => {
+      const headerH = headerRef.current?.offsetHeight || 64;
+      // leave some breathing room (padding/margins)
+      const pad = 32;
+      setAvailableHeight(window.innerHeight - headerH - pad);
+    };
+
+    calc();
+    window.addEventListener("resize", calc);
+
     return () => {
+      window.removeEventListener("resize", calc);
       document.body.style.overflow = "unset";
     };
   }, []);
@@ -47,7 +62,10 @@ export const PdfModal = ({
 
   return (
     <div className="fixed inset-0 z-[100] flex flex-col bg-black/95 backdrop-blur-md overflow-hidden">
-      <div className="h-16 bg-secondary flex items-center justify-between px-6 border-b border-border z-10 shrink-0">
+      <div
+        ref={headerRef}
+        className="h-16 bg-secondary flex items-center justify-between px-6 border-b border-border z-10 shrink-0"
+      >
         <button
           onClick={() =>
             replaceParams({ view: isSideBySide ? "single" : "double" })
@@ -58,7 +76,7 @@ export const PdfModal = ({
         </button>
 
         <div className="flex-1 max-w-xs">
-          <Pagination totalPages={numPages} useReplace={true} />
+          <Pagination totalPages={numPages} replaceOnChange />
         </div>
 
         <button
@@ -70,19 +88,23 @@ export const PdfModal = ({
       </div>
 
       <div
-        className={`grow overflow-auto px-10 pb-10 pt-6 flex justify-center ${
-          isZoomed ? "items-start" : "items-center"
-        }`}
+        className={`grow overflow-auto px-10 pb-10 pt-6 flex justify-center items-start`}
       >
         <div
           className="flex gap-8 cursor-zoom-in mx-auto h-fit"
-          onClick={() => replaceParams({ zoom: isZoomed ? "false" : "true" })}
+          onClick={() => setIsZoomed((v) => !v)}
         >
           {pagesToRender.map((pageNum) => (
             <div key={pageNum} className="shadow-2xl">
               <Page
                 pageNumber={pageNum}
-                height={isZoomed ? 1200 : 800}
+                height={
+                  availableHeight
+                    ? Math.max(200, availableHeight)
+                    : isZoomed
+                    ? 1200
+                    : 800
+                }
                 renderTextLayer={false}
                 renderAnnotationLayer={false}
               />

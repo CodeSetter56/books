@@ -11,19 +11,18 @@ import {
 
 export default function Pagination({
   totalPages,
-  useReplace = false,
+  replaceOnChange,
 }: {
   totalPages: number;
-  useReplace?: boolean;
+  replaceOnChange?: boolean;
 }) {
   const { getParam, updateParams, replaceParams } = useUrlState();
   const currentPage = Number(getParam("page", String(paginationDefaults.PAGE)));
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
-      // Use replaceParams if in modal context, otherwise updateParams
-      const paramUpdater = useReplace ? replaceParams : updateParams;
-      paramUpdater({ page: String(newPage) });
+      if (replaceOnChange) replaceParams({ page: String(newPage) });
+      else updateParams({ page: String(newPage) });
     }
   };
 
@@ -48,7 +47,7 @@ export default function Pagination({
 
       <div className="flex items-center gap-1">
         <input
-          key={currentPage}
+          key={currentPage} // Forces re-render when page changes via buttons
           type="text"
           defaultValue={currentPage}
           onBlur={(e) => handlePageChange(Number(e.target.value))}
