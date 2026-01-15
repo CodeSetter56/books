@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import getBooks from "../BookService";
-import { IBookParams } from "../BookTypes";
+import { IBookParams } from "@/lib/types";
 
 export function useBooks({ search, page, limit }: IBookParams) {
   return useQuery({

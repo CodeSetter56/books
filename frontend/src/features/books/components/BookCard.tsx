@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { IBook } from "../BookTypes";
 import LinkButton from "@/components/LinkButton";
+import { IBook } from "@/lib/types";
 
 export default function BookCard({ book }: { book: IBook }) {
   return (

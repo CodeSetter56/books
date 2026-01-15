@@ -5,8 +5,8 @@ import { useBooks } from "@/features/books/hooks/useBooks";
 import BookCard from "./BookCard";
 import CardSkeleton from "@/components/Skeletons/CardSkeleton";
 import { paginationDefaults } from "@/config/constants";
-import { IBook } from "../BookTypes";
 import Pagination from "@/components/Pagination";
+import { IBook } from "@/lib/types";
 
 export default function BooksTable() {
   const searchParams = useSearchParams();

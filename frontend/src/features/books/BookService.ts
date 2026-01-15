@@ -1,5 +1,5 @@
 import { config } from "@/lib/config";
-import { IBookParams } from "./BookTypes";
+import { IBookParams } from "@/lib/types";
 
 export default async function getBooks({ page, limit, search }: IBookParams) {
   const url = new URL(`${config.backend_url}/books`);
