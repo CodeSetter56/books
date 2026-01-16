@@ -50,30 +50,26 @@ export const updateBook = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { title, genre } = req.body;
-  const files = req.files as UploadedFiles;
   const { bookId } = req.params;
-  const userId = req.userId;
+  const files = req.files as UploadedFiles;
 
   try {
     const book = await Book.findById(bookId);
     if (!book) return next(createHttpError(404, "Book not found"));
+    if (book.author.toString() !== req.userId)
+      return next(createHttpError(403, "Forbidden"));
 
-    if (book.author.toString() !== userId) return next(createHttpError(403, "Forbidden: You do not own this book"));
+    // Dynamically build update object
+    const updateData: Partial<IBook> = { ...req.body };
 
-    const updateData: Partial<IBook> = {};
-
-    if (title) updateData.title = title;
-    if (genre) updateData.genre = genre;
-
-    if (files.coverimg?.[0]) {
+    if (files?.coverimg?.[0]) {
       updateData.coverimg = await uploadFileToCloudinary(
         files.coverimg[0],
         "book_covers",
         "image"
       );
     }
-    if (files.file?.[0]) {
+    if (files?.file?.[0]) {
       updateData.file = await uploadFileToCloudinary(
         files.file[0],
         "book_files",
@@ -85,8 +81,8 @@ export const updateBook = async (
       new: true,
     });
 
-    // Cleanup old Cloudinary assets if files were replaced...
-    if (files.coverimg?.[0] || files.file?.[0]) {
+    // Cleanup logic remains same
+    if (files?.coverimg?.[0] || files?.file?.[0]) {
       await deleteCloudinaryAssets(
         files.coverimg?.[0] ? book.coverimg : "",
         files.file?.[0] ? book.file : "",
@@ -94,10 +90,9 @@ export const updateBook = async (
       );
     }
 
-    res.status(200).json({ message: "Book updated successfully", updatedBook });
-
+    res.status(200).json({ message: "Updated", updatedBook });
   } catch (error) {
-    next(createHttpError(500, "Failed to update book"));
+    next(createHttpError(500, "Update failed"));
   }
 };
 

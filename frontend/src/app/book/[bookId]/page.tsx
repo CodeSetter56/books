@@ -2,8 +2,8 @@
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getQueryClient } from "@/providers/getQueryClient";
-import { getBookById } from "@/features/books/BookService";
-import BookViewContent from "@/features/books/components/BookViewContent";
+import BookViewContent from "@/components/BookViewContent";
+import { getBookById } from "@/lib/api/book";
 
 export default async function BookPage({
   params,

@@ -44,8 +44,8 @@ bookRouter.delete(
   deleteBook as RequestHandler
 );
 
+bookRouter.get("/my-books", getMyBooks as RequestHandler);
 bookRouter.get("/", getAllBooks)
 bookRouter.get("/:bookId", getBook)
-bookRouter.get("/my-books", getMyBooks as RequestHandler);
 
 export default bookRouter;

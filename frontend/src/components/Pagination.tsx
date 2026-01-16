@@ -1,80 +1,40 @@
 "use client";
 
-import { useUrlState } from "@/hooks/useUrlState";
-import { paginationDefaults } from "@/config/constants";
-import {
-  MdOutlineKeyboardArrowLeft,
-  MdOutlineKeyboardArrowRight,
-  MdOutlineKeyboardDoubleArrowLeft,
-  MdOutlineKeyboardDoubleArrowRight,
-} from "react-icons/md";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function Pagination({
-  totalPages,
-  replaceOnChange,
-}: {
-  totalPages: number;
-  replaceOnChange?: boolean;
-}) {
-  const { getParam, updateParams, replaceParams } = useUrlState();
-  const currentPage = Number(getParam("page", String(paginationDefaults.PAGE)));
+export default function Pagination({ totalPages }: { totalPages: number }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentPage = Number(searchParams.get("page")) || 1;
 
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      if (replaceOnChange) replaceParams({ page: String(newPage) });
-      else updateParams({ page: String(newPage) });
-    }
+  const changePage = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    const params = new URLSearchParams(searchParams);
+    params.set("page", String(newPage));
+    router.push(`?${params.toString()}`);
   };
 
   return (
-    <div className="w-full flex items-center justify-center gap-2">
-      <div className="flex items-center">
-        <button
-          disabled={currentPage <= 1}
-          onClick={() => handlePageChange(1)}
-          className="disabled:text-text-muted disabled:cursor-default text-primary cursor-pointer"
-        >
-          <MdOutlineKeyboardDoubleArrowLeft size={30} />
-        </button>
-        <button
-          disabled={currentPage <= 1}
-          onClick={() => handlePageChange(currentPage - 1)}
-          className="disabled:text-text-muted disabled:cursor-default text-primary cursor-pointer"
-        >
-          <MdOutlineKeyboardArrowLeft size={30} />
-        </button>
-      </div>
+    <div className="flex items-center gap-4 justify-center">
+      <button
+        disabled={currentPage === 1}
+        onClick={() => changePage(currentPage - 1)}
+        className="px-4 py-2 border rounded disabled:opacity-50"
+      >
+        Previous
+      </button>
 
-      <div className="flex items-center gap-1">
-        <input
-          key={currentPage} // Forces re-render when page changes via buttons
-          type="text"
-          defaultValue={currentPage}
-          onBlur={(e) => handlePageChange(Number(e.target.value))}
-          onKeyDown={(e) =>
-            e.key === "Enter" && handlePageChange(Number(e.currentTarget.value))
-          }
-          className="w-10 bg-primary text-white text-center py-1 font-semibold rounded-lg focus:outline-none"
-        />
-        <span className="text-text-muted text-xs">/ {totalPages}</span>
-      </div>
+      <span className="text-sm">
+        Page {currentPage} of {totalPages}
+      </span>
 
-      <div className="flex items-center">
-        <button
-          disabled={currentPage >= totalPages}
-          onClick={() => handlePageChange(currentPage + 1)}
-          className="disabled:text-text-muted disabled:cursor-default text-primary cursor-pointer"
-        >
-          <MdOutlineKeyboardArrowRight size={30} />
-        </button>
-        <button
-          disabled={currentPage >= totalPages}
-          onClick={() => handlePageChange(totalPages)}
-          className="disabled:text-text-muted disabled:cursor-default text-primary cursor-pointer"
-        >
-          <MdOutlineKeyboardDoubleArrowRight size={30} />
-        </button>
-      </div>
+      <button
+        disabled={currentPage === totalPages}
+        onClick={() => changePage(currentPage + 1)}
+        className="px-4 py-2 border rounded disabled:opacity-50"
+      >
+        Next
+      </button>
     </div>
   );
 }

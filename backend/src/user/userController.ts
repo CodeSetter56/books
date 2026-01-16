@@ -7,6 +7,7 @@ import { generateTokens, setRefreshTokenCookie } from "./userHelper";
 import { config } from "../config/config";
 import { IUser } from "./userTypes"; 
 import { User } from "./userModel";
+import { AuthRequest } from "../middlewares/authenticate";
 
 export const createUser = async (
   req: Request,
@@ -102,4 +103,20 @@ export const logoutUser = (req: Request, res: Response) => {
   res.clearCookie(config.refreshToken.cookieName);
   console.log("[Auth] User logged out, cookie cleared");
   res.status(200).json({ message: "Logged out successfully" });
+};
+
+export const getUserSelf = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = await User.findById(req.userId).select("-password");
+    if (!user) {
+      return next(createHttpError(404, "User not found"));
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    return next(createHttpError(500, "Error fetching user profile"));
+  }
 };

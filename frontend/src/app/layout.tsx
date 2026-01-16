@@ -1,3 +1,5 @@
+// frontend/src/app/layout.tsx
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -34,7 +36,11 @@ export default function RootLayout({
       >
         <Providers>
           <Navbar />
-          <main className="grow">{children}</main>
+          {/* 'grow' fills the space between Navbar and Footer.
+              'flex flex-col' allows the children (your page content) 
+              to use flex properties like justify-center to center themselves vertically.
+          */}
+          <main className="grow flex flex-col">{children}</main>
           <Footer />
         </Providers>
       </body>

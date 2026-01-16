@@ -1,6 +1,6 @@
 import Image from "next/image";
-import LinkButton from "@/components/LinkButton";
 import { IBook } from "@/lib/types";
+import Link from "next/link";
 
 export default function BookCard({ book }: { book: IBook }) {
   return (
@@ -31,7 +31,12 @@ export default function BookCard({ book }: { book: IBook }) {
         </div>
 
         <div className="mt-auto">
-          <LinkButton destination={`/book/${book._id}`} text="Read More" />
+          <Link
+            href={`/book/${book._id}`}
+            className="px-4 py-2 border border-primary rounded-2xl hover:bg-primary hover:text-white"
+          >
+            Read
+          </Link>
         </div>
       </div>
     </div>

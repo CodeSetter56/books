@@ -1,26 +1,25 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useBooks } from "@/features/books/hooks/useBooks";
+import { useBooks } from "@/hooks/useBooks";
 import BookCard from "./BookCard";
-import CardSkeleton from "@/components/Skeletons/CardSkeleton";
-import { paginationDefaults } from "@/config/constants";
 import Pagination from "@/components/Pagination";
 import { IBook } from "@/lib/types";
+import Skeleton from "./Skeleton";
 
 export default function BooksTable() {
   const searchParams = useSearchParams();
 
-  const page = Number(searchParams.get("page")) || paginationDefaults.PAGE;
-  const limit = Number(searchParams.get("limit")) || paginationDefaults.LIMIT;
-  const search = searchParams.get("search") || paginationDefaults.SEARCH;
+  const page = Number(searchParams.get("page")) || 1
+  const limit = Number(searchParams.get("limit")) || 6
+  const search = searchParams.get("search") || ""
 
   const { data, isLoading, error } = useBooks({ page, limit, search });
 
   if (isLoading)
     return (
       <div className="mt-10">
-        <CardSkeleton />
+        <Skeleton />
       </div>
     );
 
