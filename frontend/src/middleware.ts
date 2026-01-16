@@ -9,13 +9,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  if (!token && pathname.startsWith("/profile")) {
-    return NextResponse.redirect(new URL("/authenticate", request.url));
-  }
-
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/authenticate/:path*", "/profile/:path*"],
+  matcher: ["/authenticate/:path*"],
 };

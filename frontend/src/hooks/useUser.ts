@@ -1,24 +1,16 @@
 // frontend/src/hooks/useUser.ts
 import { useQuery } from "@tanstack/react-query";
 import { getMe } from "@/lib/api/user";
-import { IUser } from "@/lib/types";
 
 export const useUser = () => {
-  const { data, isLoading, isError, error } = useQuery<IUser>({
+  return useQuery({
     queryKey: ["me"],
     queryFn: getMe,
-    // Do not retry if the error is "Not logged in" to avoid unnecessary requests
     retry: (failureCount, error: any) => {
-      if (error?.message === "Not logged in") return false;
+      // Don't retry if it's a 401 that couldn't be refreshed
+      if (error.response?.status === 401) return false;
       return failureCount < 3;
     },
-    staleTime: 1000 * 60 * 5, // Consider user data fresh for 5 minutes
+    staleTime: 1000 * 60 * 5,
   });
-
-  return {
-    user: data,
-    isLoading,
-    isLoggedIn: !!data,
-    error: error as Error | null,
-  };
 };
