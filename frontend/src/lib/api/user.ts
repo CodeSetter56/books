@@ -7,6 +7,7 @@ export const register = async (data: Partial<IUser>) => {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
+    credentials: "include", // Required to receive HttpOnly cookies
   });
 
   if (!res.ok) {
@@ -21,6 +22,7 @@ export const login = async (data: Partial<IUser>) => {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
+    credentials: "include", // Required to receive HttpOnly cookies
   });
 
   if (!res.ok) {
@@ -30,12 +32,10 @@ export const login = async (data: Partial<IUser>) => {
   return res.json();
 };
 
-// frontend/src/lib/api/user.ts
-
 export const getMe = async (): Promise<IUser> => {
   const res = await fetch(`${config.backend_url}/users/me`, {
-    // browser sends cookies automatically if credentials are included
-    // or if the request is same-origin
+    method: "GET",
+    credentials: "include", // Required to send HttpOnly cookies to the backend
   });
 
   if (!res.ok) throw new Error("Not logged in");
