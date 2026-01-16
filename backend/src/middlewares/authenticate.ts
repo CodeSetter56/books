@@ -8,31 +8,19 @@ export interface AuthRequest extends Request {
 }
 
 const authenticate = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.header("Authorization");
+  // Extract token from cookies instead of header
+  const token = req.cookies.accessToken;
 
-  // Early return if header is missing or incorrect format
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    console.warn("[Auth Middleware] Access denied: No Bearer token provided.");
-    return next(createHttpError(401, "Authorization token is required."));
+  if (!token) {
+    return next(createHttpError(401, "Authentication required."));
   }
 
-  const token = authHeader.split(" ")[1];
-
   try {
-    const decoded = verify(token as string, config.jwtSecret as string) as {
-      sub: string;
-    };
-    const _req = req as AuthRequest;
-    _req.userId = decoded.sub;
-
-    console.log(`[Auth Middleware] User authenticated: ${_req.userId}`);
+    const decoded = verify(token, config.jwtSecret as string) as { sub: string };
+    (req as AuthRequest).userId = decoded.sub;
     next();
   } catch (err) {
-    console.error(
-      "[Auth Middleware] Token verification failed:",
-      (err as Error).message
-    );
-    return next(createHttpError(401, "Token expired or invalid."));
+    return next(createHttpError(401, "Invalid or expired token."));
   }
 };
 

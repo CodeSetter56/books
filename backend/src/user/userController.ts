@@ -9,17 +9,12 @@ import { IUser } from "./userTypes";
 import { User } from "./userModel";
 import { AuthRequest } from "../middlewares/authenticate";
 
-export const createUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+
+export const createUser = async (req: Request, res: Response, next: NextFunction) => {
   const { name, email, password } = req.body;
-  console.log(name, email, password);
+  
   if (!name || !email || !password) {
-    return next(
-      createHttpError(400, "Name, email, and password are required.")
-    );
+    return next(createHttpError(400, "Name, email, and password are required."));
   }
 
   try {
@@ -27,47 +22,49 @@ export const createUser = async (
     if (existingUser) return next(createHttpError(400, "Email already in use."));
 
     const hashedpass = await bcrypt.hash(password, 10);
-
-    const newUser: IUser = await User.create({
-      name,
-      email,
-      password: hashedpass,
-    });
+    const newUser: IUser = await User.create({ name, email, password: hashedpass });
 
     const { accessToken, refreshToken } = generateTokens(newUser._id);
+    
+    // Set both tokens as HttpOnly cookies
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 15 * 60 * 1000, // 15 minutes
+    });
+    
     setRefreshTokenCookie(res, refreshToken);
 
-    console.log(`[Register] Successfully created user: ${newUser._id}`);
-
-    res.status(201).json({ accessToken });
-
+    res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
     return next(createHttpError(500, "User registration failed."));
   }
 };
 
-export const loginUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
-  console.log(`[Auth] Login attempt for email: ${email}`);
 
   try {
     const user = (await User.findOne({ email })) as IUser | null;
 
-    // Check user and password in one go
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      console.warn(`[Auth] Failed login for ${email}: Invalid credentials`);
       return next(createHttpError(401, "Invalid email or password"));
     }
 
     const { accessToken, refreshToken } = generateTokens(user._id);
+
+    // Set Access Token Cookie
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 15 * 60 * 1000,
+    });
+
     setRefreshTokenCookie(res, refreshToken);
 
-    console.log(`[Auth] Success: User ${user._id} logged in`);
-    res.status(200).json({ accessToken });
+    res.status(200).json({ message: "Login successful" });
   } catch (error) {
     next(createHttpError(500, "Internal Server Error during login"));
   }

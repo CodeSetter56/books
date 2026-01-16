@@ -30,13 +30,12 @@ export const login = async (data: Partial<IUser>) => {
   return res.json();
 };
 
+// frontend/src/lib/api/user.ts
+
 export const getMe = async (): Promise<IUser> => {
-  // Retrieve token (ideally from a cookie or secure storage)
   const res = await fetch(`${config.backend_url}/users/me`, {
-    headers: {
-      // Using your existing authenticate middleware's expected format
-      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-    },
+    // browser sends cookies automatically if credentials are included
+    // or if the request is same-origin
   });
 
   if (!res.ok) throw new Error("Not logged in");
