@@ -21,9 +21,9 @@ const _config = {
         cookieName: "refreshToken",
         tokenExpiry: {
             access: "15m" as const,
-            refresh: "7d" as const,
+            refresh: "1d" as const,
         },
-        cookieMaxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        cookieMaxAge: 1 * 24 * 60 * 60 * 1000, // 7 days
     }
 }
 

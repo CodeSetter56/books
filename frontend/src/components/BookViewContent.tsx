@@ -27,7 +27,7 @@ export default function BookViewContent() {
     <div className="container mx-auto mt-10 p-5">
       {/* Book Header Section */}
       <div className="flex flex-col md:flex-row gap-8 border p-8 shadow-xl rounded-2xl bg-secondary border-border mb-12">
-        <div className="relative w-full md:w-1/4 h-[400px] flex-shrink-0 shadow-lg">
+        <div className="relative w-full md:w-1/4 h-75 flex-shrink-0 shadow-lg">
           <Image
             className="rounded-xl object-cover"
             src={book.coverimg}
@@ -54,7 +54,7 @@ export default function BookViewContent() {
       </div>
 
       {/* Reader Section */}
-      <div className=" pt-10">
+      <div className="w-full">
         <PdfViewer fileUrl={book.file} />
       </div>
     </div>

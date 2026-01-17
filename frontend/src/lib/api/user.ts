@@ -12,7 +12,12 @@ export const login = async (data: Partial<IUser>) => {
   return res.data;
 };
 
+export const logout = async () => {
+  const res = await apiClient.post("/users/logout");
+  return res.data;
+};
+
 export const register = async (data: Partial<IUser>) => {
-  const res = await apiClient.post("/users/login", data);
+  const res = await apiClient.post("/users/register", data); 
   return res.data;
 };

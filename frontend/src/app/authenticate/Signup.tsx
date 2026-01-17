@@ -4,9 +4,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRef } from "react";
 import { IUser } from "@/lib/types";
 
-function Signin() {
+function Signup() {
   const formRef = useRef<HTMLFormElement>(null);
-  const { handleLogin, isLoading } = useAuth();
+  const { handleRegister, isLoading } = useAuth();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,13 +15,13 @@ function Signin() {
     const formData = new FormData(formRef.current);
     const data = Object.fromEntries(formData.entries()) as Partial<IUser>;
 
-    handleLogin(data);
+    handleRegister(data);
   };
 
   return (
     <div>
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-primary">Sign In</h2>
+        <h2 className="text-3xl font-bold text-primary">Register</h2>
       </div>
 
       <form
@@ -31,6 +31,23 @@ function Signin() {
       >
         <div className="flex flex-col gap-2">
           <label
+            htmlFor="name"
+            className="text-sm font-semibold text-text ml-1"
+          >
+            Username
+          </label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            required
+            placeholder="username"
+            className="w-full px-4 py-3 rounded-xl bg-background border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label
             htmlFor="email"
             className="text-sm font-semibold text-text ml-1"
           >
@@ -38,7 +55,7 @@ function Signin() {
           </label>
           <input
             id="email"
-            name="email"
+            name="email" // FIXED: Required for FormData
             type="email"
             required
             placeholder="name@example.com"
@@ -69,7 +86,7 @@ function Signin() {
               disabled={isLoading}
               className="whitespace-nowrap flex-shrink-0 px-6 py-3 border border-primary rounded-2xl hover:bg-primary hover:text-white transition-colors disabled:opacity-50"
             >
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isLoading ? "Registering..." : "Register"}
             </button>
           </div>
         </div>
@@ -78,4 +95,4 @@ function Signin() {
   );
 }
 
-export default Signin;
+export default Signup;

@@ -6,6 +6,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Providers from "../providers/QueryProvider";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} bg-background text-text antialiased flex flex-col min-h-screen`}
       >
         <Providers>
+          <Toaster position="top-right" />
           <Navbar />
           {/* 'grow' fills the space between Navbar and Footer.
               'flex flex-col' allows the children (your page content) 

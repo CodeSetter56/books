@@ -1,7 +1,7 @@
 // frontend/src/hooks/useAuth.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { login, register } from "@/lib/api/user";
+import { login, logout, register } from "@/lib/api/user";
 import { IUser } from "@/lib/types";
 
 export const useAuth = () => {
@@ -27,8 +27,21 @@ export const useAuth = () => {
     },
   });
 
+  const logoutMutation = useMutation({
+    mutationFn: logout,
+    onSuccess: () => {
+      // Clear all cached user data (the "me" query)
+      queryClient.setQueryData(["me"], null);
+      queryClient.invalidateQueries({ queryKey: ["me"] });
+
+      // Redirect to the authentication page
+      router.push("/authenticate");
+    },
+  });
+
   return {
     handleLogin: loginMutation.mutate,
+    handleLogout: logoutMutation.mutate,
     handleRegister: registerMutation.mutate,
     isLoading: loginMutation.isPending || registerMutation.isPending,
     error: (loginMutation.error || registerMutation.error) as Error | null,

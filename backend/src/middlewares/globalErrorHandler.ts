@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import { HttpError } from "http-errors";
 import { config } from "../config/config";
 
@@ -11,7 +11,7 @@ const globalErrorHandler = (
   const statusCode = err.statusCode || 500;
 
   return res.status(statusCode).json({
-    message: err.message,
+    message: err.message, // The Frontend reads this key
     errorStack: config.env === "development" ? err.stack : "",
   });
 };

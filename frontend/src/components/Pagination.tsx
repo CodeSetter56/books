@@ -1,6 +1,12 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import {
+  MdKeyboardArrowLeft,
+  MdKeyboardArrowRight,
+  MdKeyboardDoubleArrowLeft,
+  MdKeyboardDoubleArrowRight,
+} from "react-icons/md";
 
 export default function Pagination({ totalPages }: { totalPages: number }) {
   const router = useRouter();
@@ -14,26 +20,69 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
     router.push(`?${params.toString()}`);
   };
 
+  // Helper to determine Icon styles
+  const getIconStyles = (isDisabled: boolean) => {
+    return `rounded-md transition-colors ${
+      isDisabled
+        ? "text-text-muted" // Disabled color
+        : "text-primary cursor-pointer" // Active color on the icon itself
+    }`;
+  };
+
   return (
-    <div className="flex items-center gap-4 justify-center">
+    <div className="flex items-center gap-2 justify-center">
+      {/* Jump to First Page */}
+      <button
+        disabled={currentPage === 1}
+        onClick={() => changePage(1)}
+        title="First Page"
+      >
+        <MdKeyboardDoubleArrowLeft
+          size={32}
+          className={getIconStyles(currentPage === 1)}
+        />
+      </button>
+
+      {/* Previous Page */}
       <button
         disabled={currentPage === 1}
         onClick={() => changePage(currentPage - 1)}
-        className="px-4 py-2 border rounded disabled:opacity-50"
+        title="Previous Page"
       >
-        Previous
+        <MdKeyboardArrowLeft
+          size={32}
+          className={getIconStyles(currentPage === 1)}
+        />
       </button>
 
-      <span className="text-sm">
-        Page {currentPage} of {totalPages}
-      </span>
+      <div className="flex items-center gap-2 px-4 py-2 bg-secondary rounded-xl border border-border">
+        <span className="text-sm font-medium text-text">
+          {currentPage} / {totalPages}
+        </span>
+      </div>
 
+      {/* Next Page */}
       <button
         disabled={currentPage === totalPages}
         onClick={() => changePage(currentPage + 1)}
-        className="px-4 py-2 border rounded disabled:opacity-50"
+        title="Next Page"
       >
-        Next
+        <MdKeyboardArrowRight
+          size={32}
+          className={getIconStyles(currentPage === totalPages)}
+        />
+      </button>
+
+      {/* Jump to Last Page */}
+      <button
+        disabled={currentPage === totalPages}
+        onClick={() => changePage(totalPages)}
+        title="Last Page"
+      >
+        <MdKeyboardDoubleArrowRight
+          size={32}
+          className={getIconStyles(currentPage === totalPages)}
+        />
       </button>
     </div>
   );

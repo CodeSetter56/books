@@ -1,8 +1,15 @@
+"use client";
+
 import Link from "next/link";
 import { MdHexagon } from "react-icons/md";
 import { FaBookOpen } from "react-icons/fa";
+import { useUser } from "@/hooks/useUser";
+import { useAuth } from "@/hooks/useAuth";
 
 function Navbar() {
+  const { handleLogout } = useAuth();
+  const { user, isLoading } = useUser();
+
   return (
     <nav className="bg-secondary border-b border-border py-4 px-6 flex items-center justify-between">
       <div>
@@ -16,15 +23,23 @@ function Navbar() {
           </div>
         </Link>
       </div>
-      <div>
-        <Link
-          href="/authenticate"
+      {user ? (
+        <button
+          onClick={() => handleLogout()}
           className="px-4 py-2 border border-primary rounded-2xl hover:bg-primary hover:text-white"
         >
-          
-          Sign in
-        </Link>
-      </div>
+          Sign out
+        </button>
+      ) : (
+        <div>
+          <Link
+            href="/authenticate"
+            className="px-4 py-2 border border-primary rounded-2xl hover:bg-primary hover:text-white"
+          >
+            Sign in
+          </Link>
+        </div>
+      )}
     </nav>
   );
 }

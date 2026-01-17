@@ -1,7 +1,16 @@
-"use client"
+"use client";
+import { useState } from "react"; // Import useState
 import Signin from "./Signin";
+import Signup from "./Signup";
 
 function Page() {
+  // Use state instead of a regular variable
+  const [isNewUser, setIsNewUser] = useState(false);
+
+  const changeform = () => {
+    setIsNewUser((prev) => !prev); // Toggle the state
+  };
+
   return (
     <div className="flex flex-col md:flex-row w-full grow">
       {/* Left Side: Welcome Text */}
@@ -16,19 +25,37 @@ function Page() {
         </div>
       </div>
 
-      {/* Right Side: Signin Component */}
-      {/* Removed items-center and justify-center to allow h-full to work */}
+      {/* Right Side: Form Container */}
       <div className="w-full grow flex items-center justify-center p-10 flex-col">
-    <div className="w-full max-w-md p-8 rounded-3xl bg-secondary border border-border shadow-xl">
-
-        <Signin />
-        <p className="text-center text-sm text-text-muted">
-          Don't have an account?{" "}
-          <span className="text-primary font-bold cursor-pointer hover:underline">
-            Sign up
-          </span>
-        </p>
-    </div>
+        <div className="w-full max-w-md p-8 rounded-3xl bg-secondary border border-border shadow-xl">
+          {isNewUser ? (
+            <>
+              <Signup />
+              <p className="text-center text-sm text-text-muted mt-4">
+                Already have an account?{" "}
+                <span
+                  onClick={changeform}
+                  className="text-primary font-bold cursor-pointer hover:underline"
+                >
+                  Sign in
+                </span>
+              </p>
+            </>
+          ) : (
+            <>
+              <Signin />
+              <p className="text-center text-sm text-text-muted mt-4">
+                Don't have an account?{" "}
+                <span
+                  onClick={changeform}
+                  className="text-primary font-bold cursor-pointer hover:underline"
+                >
+                  Register
+                </span>
+              </p>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

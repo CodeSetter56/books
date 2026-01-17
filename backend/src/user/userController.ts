@@ -70,27 +70,28 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
   }
 };
 
-export const refreshAccessToken = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+// backend/src/user/userController.ts
+
+export const refreshAccessToken = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies[config.refreshToken.cookieName];
 
-  if (!token) {
-    console.warn("[Auth] Refresh failed: No cookie present");
-    return next(createHttpError(401, "Session expired. Please login again."));
-  }
+  if (!token) return next(createHttpError(401, "Session expired."));
 
   try {
-    const decoded = verify(token, config.jwtSecret as string) as {
-      sub: string;
-    };
+    const decoded = verify(token, config.jwtSecret as string) as { sub: string };
     const { accessToken } = generateTokens(decoded.sub);
 
-    res.status(200).json({ accessToken });
+    // CRITICAL: You MUST set the cookie again so the browser stores it
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 15 * 60 * 1000,
+    });
+
+    console.log("[Auth] Token refreshed for user:", decoded.sub);
+    res.status(200).json({ message: "Token refreshed" });
   } catch (err) {
-    console.error("[Auth] Refresh token verification failed, clearing cookie");
     res.clearCookie(config.refreshToken.cookieName);
     return next(createHttpError(401, "Invalid session"));
   }
@@ -98,7 +99,7 @@ export const refreshAccessToken = async (
 
 export const logoutUser = (req: Request, res: Response) => {
   res.clearCookie(config.refreshToken.cookieName);
-  console.log("[Auth] User logged out, cookie cleared");
+  res.clearCookie("accessToken"); // Clear both
   res.status(200).json({ message: "Logged out successfully" });
 };
 
