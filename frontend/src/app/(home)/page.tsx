@@ -20,31 +20,27 @@ export default async function Home({
     search: search || "",
   };
 
-  // Prefetch data on server
   await queryClient.prefetchQuery({
     queryKey: ["books", params],
     queryFn: () => getBooks(params),
   });
 
-  // BLOAT REMOVED: useUser() is no longer called here on the server
-
   return (
-    <div className="w-full p-8">
+    <div className="p-8">
+      {" "}
+      {/* Changed to container mx-auto */}
       <div className="flex flex-col items-center md:items-start gap-6">
-        {/* This is now a Client Component and safe to use hooks */}
         <WelcomeText />
-
         <div className="text-sm md:text-xl font-light italic text-text text-center md:text-left">
           Browse, create, read till your heart's content
         </div>
       </div>
-
       <div className="w-full mt-12 border border-border rounded-2xl p-4 ">
         <HydrationBoundary state={dehydrate(queryClient)}>
           <Suspense
             fallback={
-              <div className="mt-10">
-                <Skeleton />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4 mt-10">
+                <Skeleton count={6} />
               </div>
             }
           >

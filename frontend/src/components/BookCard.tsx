@@ -1,26 +1,34 @@
 "use client";
 
+import { useState } from "react"; // Added useState
 import Image from "next/image";
 import { IBook } from "@/lib/types";
 import Link from "next/link";
 import { useUser } from "@/hooks/useUser";
-
-import { FaLink , FaEdit } from "react-icons/fa";
+import { FaLink, FaEdit } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 
 export default function BookCard({ book }: { book: IBook }) {
-  const { user, isLoading } = useUser();
+  const { user } = useUser();
+  const [imgLoading, setImgLoading] = useState(true); // Image loading state
 
   return (
     <div className="flex flex-col md:flex-row gap-5 border p-5 shadow-md rounded-xl bg-secondary border-border h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-      <div className="flex-shrink-0 flex justify-center items-start">
+      <div className="flex-shrink-0 flex justify-center items-start relative">
+        {imgLoading && ( // Local skeleton placeholder
+          <div
+            className="rounded-xl bg-gray-200 animate-pulse absolute inset-0"
+            style={{ width: "150px", height: "12rem" }}
+          />
+        )}
         <Image
-          className="rounded-xl object-cover"
+          className={`rounded-xl object-cover transition-opacity duration-300 ${imgLoading ? "opacity-0" : "opacity-100"}`}
           src={book.coverimg}
           alt={book.title}
           width={150}
           height={200}
           style={{ width: "auto", height: "12rem" }}
+          onLoadingComplete={() => setImgLoading(false)}
         />
       </div>
 
@@ -40,7 +48,7 @@ export default function BookCard({ book }: { book: IBook }) {
 
         <div className="mt-auto flex justify-end gap-4 text-lg text-text-muted">
           <Link href={`/book/${book._id}`} className=" hover:text-primary">
-            <FaLink/>
+            <FaLink />
           </Link>
           {user?._id === book.author._id && (
             <>

@@ -3,12 +3,9 @@
 import { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { useRouter, useSearchParams } from "next/navigation";
-
-// IMPORTANT: Missing CSS imports that prevent repeated text
 import "react-pdf/dist/Page/TextLayer.css";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 
-// Reliable CDN for the worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 export default function PdfViewer({ fileUrl }: { fileUrl: string }) {
@@ -35,36 +32,43 @@ export default function PdfViewer({ fileUrl }: { fileUrl: string }) {
         file={fileUrl}
         onLoadSuccess={({ numPages }) => setNumPages(numPages)}
         loading={
-          <div className="text-primary text-center py-10">
-            Loading Document...
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-64 bg-secondary border border-border rounded-lg animate-pulse"
+              />
+            ))}
           </div>
         }
         className="flex flex-col items-center"
       >
-        {/* Thumbnail Gallery */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4 w-full">
           {Array.from({ length: numPages }, (_, i) => (
             <div
               key={i}
               onClick={() => openPage(i + 1)}
-              className="cursor-pointer group relative bg-secondary p-2 rounded-lg border border-border hover:border-primary transition-all shadow-sm"
+              className="cursor-pointer group bg-secondary p-3 rounded-2xl transition-all duration-300 shadow-md hover:shadow-xl hover:-translate-y-1 border border-border flex flex-col items-center"
             >
-              <Page
-                pageNumber={i + 1}
-                width={200}
-                renderTextLayer={false} // Keep false for speed on thumbnails
-                renderAnnotationLayer={false}
-              />
-              <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                <span className="bg-primary text-white px-3 py-1 rounded-full text-xs">
-                  View Page {i + 1}
-                </span>
+              {/* PDF Wrapper: Relative so the page number can be absolute positioned over it */}
+              <div className="relative w-full flex justify-center overflow-hidden rounded-lg">
+                <Page
+                  pageNumber={i + 1}
+                  width={220}
+                  renderTextLayer={false}
+                  renderAnnotationLayer={false}
+                  className="max-w-full shadow-sm"
+                />
+
+                {/* Page Number Badge over the PDF */}
+                <div className="absolute bottom-2 right-2 z-10 bg-primary text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shadow-lg">
+                  {i + 1}
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Full View Modal */}
         {selectedPage && (
           <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex flex-col items-center">
             <div className="w-full p-4 flex justify-between items-center border-b border-white/10 bg-black">
@@ -88,7 +92,7 @@ export default function PdfViewer({ fileUrl }: { fileUrl: string }) {
                       ? window.innerHeight * 0.8
                       : 800
                   }
-                  renderTextLayer={true} // Enabled now that CSS is imported
+                  renderTextLayer={true}
                   renderAnnotationLayer={false}
                 />
               </div>
