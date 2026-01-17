@@ -3,7 +3,6 @@ import BooksTable from "@/components/BooksTable";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getQueryClient } from "@/providers/getQueryClient";
 import getBooks from "@/lib/api/book";
-import Skeleton from "@/components/Skeleton";
 import WelcomeText from "./WelcomeText";
 
 export default async function Home({
@@ -27,8 +26,6 @@ export default async function Home({
 
   return (
     <div className="p-8">
-      {" "}
-      {/* Changed to container mx-auto */}
       <div className="flex flex-col items-center md:items-start gap-6">
         <WelcomeText />
         <div className="text-sm md:text-xl font-light italic text-text text-center md:text-left">
@@ -38,11 +35,11 @@ export default async function Home({
       <div className="w-full mt-12 border border-border rounded-2xl p-4 ">
         <HydrationBoundary state={dehydrate(queryClient)}>
           <Suspense
-            fallback={
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4 mt-10">
-                <Skeleton count={6} />
-              </div>
-            }
+          fallback={
+            <div>
+              Loading...
+            </div>
+          }
           >
             <BooksTable />
           </Suspense>

@@ -32,13 +32,8 @@ export default function PdfViewer({ fileUrl }: { fileUrl: string }) {
         file={fileUrl}
         onLoadSuccess={({ numPages }) => setNumPages(numPages)}
         loading={
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-64 bg-secondary border border-border rounded-lg animate-pulse"
-              />
-            ))}
+          <div>
+            Loading...
           </div>
         }
         className="flex flex-col items-center"
@@ -50,7 +45,6 @@ export default function PdfViewer({ fileUrl }: { fileUrl: string }) {
               onClick={() => openPage(i + 1)}
               className="cursor-pointer group bg-secondary p-3 rounded-2xl transition-all duration-300 shadow-md hover:shadow-xl hover:-translate-y-1 border border-border flex flex-col items-center"
             >
-              {/* PDF Wrapper: Relative so the page number can be absolute positioned over it */}
               <div className="relative w-full flex justify-center overflow-hidden rounded-lg">
                 <Page
                   pageNumber={i + 1}
@@ -59,8 +53,6 @@ export default function PdfViewer({ fileUrl }: { fileUrl: string }) {
                   renderAnnotationLayer={false}
                   className="max-w-full shadow-sm"
                 />
-
-                {/* Page Number Badge over the PDF */}
                 <div className="absolute bottom-2 right-2 z-10 bg-primary text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shadow-lg">
                   {i + 1}
                 </div>

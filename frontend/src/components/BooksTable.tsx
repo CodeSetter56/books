@@ -5,23 +5,23 @@ import { useBooks } from "@/hooks/useBooks";
 import BookCard from "./BookCard";
 import Pagination from "@/components/Pagination";
 import { IBook } from "@/lib/types";
-import Skeleton from "./Skeleton";
 
 export default function BooksTable() {
   const searchParams = useSearchParams();
 
-  const page = Number(searchParams.get("page")) || 1
-  const limit = Number(searchParams.get("limit")) || 6
-  const search = searchParams.get("search") || ""
+  const page = Number(searchParams.get("page")) || 1;
+  const limit = Number(searchParams.get("limit")) || 6;
+  const search = searchParams.get("search") || "";
 
   const { data, isLoading, error } = useBooks({ page, limit, search });
 
-if (isLoading)
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4 mt-10">
-      <Skeleton count={6} />
-    </div>
-  );
+  if (isLoading)
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4 mt-10">
+        Loading...
+      </div>
+    );
+
   if (error) {
     return (
       <div className="text-red-500 font-bold p-4 text-center">
