@@ -113,7 +113,7 @@ export const deleteBook = async (
     await deleteCloudinaryAssets(book.coverimg, book.file, true);
     await Book.findByIdAndDelete(bookId);
 
-    res.status(204).json({ message: "Book deleted successfully" });
+    res.status(200).json({ message: "Book deleted successfully" });
     
   } catch (error) {
     next(createHttpError(500, "Deletion failed"));

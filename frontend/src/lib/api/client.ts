@@ -42,8 +42,10 @@ apiClient.interceptors.response.use(
 
     // 2. Handle All Other Errors
     // Ensure we are drilling down into response.data.message
-    const errorMessage =
-      error.response?.data?.message || error.message || "An error occurred";
+const errorMessage =
+  error.response?.data?.message || // Backend globalErrorHandler key
+  error.message ||
+  "An error occurred";
 
     // Only show toast if it's not a 401 we are currently refreshing
     if (

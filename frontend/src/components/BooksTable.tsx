@@ -16,13 +16,12 @@ export default function BooksTable() {
 
   const { data, isLoading, error } = useBooks({ page, limit, search });
 
-  if (isLoading)
-    return (
-      <div className="mt-10">
-        <Skeleton />
-      </div>
-    );
-
+if (isLoading)
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4 mt-10">
+      <Skeleton count={6} />
+    </div>
+  );
   if (error) {
     return (
       <div className="text-red-500 font-bold p-4 text-center">
