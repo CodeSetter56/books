@@ -23,28 +23,27 @@ export default function BookViewContent() {
   const { bookId } = useParams();
   const { data: book, isLoading, error } = useBook(bookId as string);
 
-  if (isLoading)
-    // Enhanced loading state
-    return (
-      <div className="container mx-auto mt-10 p-5">
-        <div className="flex flex-col md:flex-row gap-8 border p-8 shadow-xl rounded-2xl bg-secondary border-border mb-12 animate-pulse">
-          <div className="w-full md:w-1/4 h-72 bg-gray-200 rounded-xl flex-shrink-0" />
-          <div className="flex flex-col py-2 flex-grow">
-            <div className="h-12 bg-gray-200 rounded w-3/4 mb-4" />
-            <div className="h-8 bg-gray-200 rounded w-1/2 mb-6" />
-            <div className="h-6 bg-gray-200 rounded-full w-24" />
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-64 bg-secondary border border-border rounded-lg animate-pulse"
-            />
-          ))}
-        </div>
-      </div>
-    );
+ if (isLoading)
+   return (
+     <div className="container mx-auto mt-10 p-5">
+       <div className="flex flex-col md:flex-row gap-8 border p-8 shadow-xl rounded-2xl bg-secondary border-border mb-12 animate-pulse">
+         <div className="w-full md:w-1/4 h-72 bg-secondary border border-border rounded-xl flex-shrink-0" />
+         <div className="flex flex-col py-2 flex-grow">
+           <div className="h-12 bg-secondary border border-border rounded w-3/4 mb-4" />
+           <div className="h-8 bg-secondary border border-border rounded w-1/2 mb-6" />
+           <div className="h-6 bg-secondary border border-border rounded-full w-24" />
+         </div>
+       </div>
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+         {Array.from({ length: 4 }).map((_, i) => (
+           <div
+             key={i}
+             className="h-64 bg-secondary border border-border rounded-lg animate-pulse"
+           />
+         ))}
+       </div>
+     </div>
+   );
 
   if (error || !book) return notFound();
 
