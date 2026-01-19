@@ -1,12 +1,12 @@
 "use client";
 
+import { useBook } from "@/hooks/useBook";
 import dynamic from "next/dynamic";
-import { useBook } from "../hooks/useBook";
 import Image from "next/image";
 import { notFound, useParams } from "next/navigation";
 
 
-const PdfViewer = dynamic(() => import("./PdfViewer"), {
+const PdfViewer = dynamic(() => import("../Pdf/PdfViewer"), {
   ssr: false,
   loading: () => (
     <div>

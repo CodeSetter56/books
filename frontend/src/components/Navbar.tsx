@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 function Navbar() {
   const { handleLogout } = useAuth();
-  const { user, isLoading } = useUser();
+  const { data: user, isLoading } = useUser();
 
   return (
     <nav className="bg-secondary border-b border-border py-4 px-6 flex items-center justify-between">

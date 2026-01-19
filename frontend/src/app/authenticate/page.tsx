@@ -1,15 +1,8 @@
-"use client";
-import { useState } from "react"; // Import useState
-import Signin from "./Signin";
-import Signup from "./Signup";
+import Rightside from "./Rightside";
 
 function Page() {
   // Use state instead of a regular variable
-  const [isNewUser, setIsNewUser] = useState(false);
 
-  const changeform = () => {
-    setIsNewUser((prev) => !prev); // Toggle the state
-  };
 
   return (
     <div className="flex flex-col md:flex-row w-full grow">
@@ -27,35 +20,7 @@ function Page() {
 
       {/* Right Side: Form Container */}
       <div className="w-full grow flex items-center justify-center p-10 flex-col">
-        <div className="w-full max-w-md p-8 rounded-3xl bg-secondary border border-border shadow-xl">
-          {isNewUser ? (
-            <>
-              <Signup />
-              <p className="text-center text-sm text-text-muted mt-4">
-                Already have an account?{" "}
-                <span
-                  onClick={changeform}
-                  className="text-primary font-bold cursor-pointer hover:underline"
-                >
-                  Sign in
-                </span>
-              </p>
-            </>
-          ) : (
-            <>
-              <Signin />
-              <p className="text-center text-sm text-text-muted mt-4">
-                Don't have an account?{" "}
-                <span
-                  onClick={changeform}
-                  className="text-primary font-bold cursor-pointer hover:underline"
-                >
-                  Register
-                </span>
-              </p>
-            </>
-          )}
-        </div>
+        <Rightside />
       </div>
     </div>
   );
